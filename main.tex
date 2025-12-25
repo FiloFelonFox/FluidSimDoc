@@ -1,0 +1,189 @@
+\documentclass{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[polish]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Praca inżynierska}
+\author{ehhhhhhhhh}
+
+\begin{document}
+\newpage
+\tableofcontents
+
+\section{Wstęp}
+
+\section{Cel i zakres}
+Celem pracy jest stworzenie symulacji cząsteczkowej płynu opartej o równania Naviera-Stokesa oraz zbadanie wydajności zaproponowanej metody optymalizacji.
+
+\section{Wstęp teoretyczny}
+\subsection{Równania Naviera-Stokesa}
+Równania Naviera–Stokesa stanowią podstawowy zestaw równań opisujących ruch płynów, zarówno cieczy, jak i gazów. Ich sformułowanie opiera się na zasadzie zachowania pędu, zgodnie z którą zmiany pędu elementarnej objętości płynu wynikają z oddziaływania sił działających na ten element. Równania zakładają że zmiany zależą od sił lepkości, sił wynikających z ciśnienia oraz sił masowe, takich jak siła grawitacji.\newline
+
+Równania zapisane są w postaci równań różniczkowych cząstkowych i do ich rozwiązania niezbędne jest zastosowanie narzędzi rachunku różniczkowego i całkowego. Przez wzgląd na swoją nieliniowość oraz sprzężenie pomiędzy składowymi prędkości, ich rozwiązanie stanowi istotne wyzwanie obliczeniowe, co powoduje, że uzyskanie rozwiązań drogą analityczną jest realistyczne jedynie w najprostszych przypadkach, takich jak ustalony, laminarny i nieturbulentny przepływ w geometriach prostych.\newline
+
+W przypadkach bardziej złożonych zagadnień, w szczególności przepływów niestacjonarnych, trójwymiarowych lub turbulentnych, stosowanych m.in. w obliczeniach aerodynamicznych i inżynierskich, konieczne jest wykorzystanie metod numerycznych. Metody te, implementowane w narzędziach obliczeniowej mechaniki płynów (CFD), umożliwiają przybliżone rozwiązanie równań Naviera–Stokesa i analizę rzeczywistych zjawisk przepływowych, które nie są możliwe do opisania metodami analitycznymi.\newline
+Zapis równań Naviera-Stokesa w kartezjańskim układzie współrzędnych wygląda następująco:
+
+$$ 
+\rho 
+\frac{du }{dt }
+= X 
+- \frac{\partial  p }{\partial x }
++ \frac \partial {\partial  x }
+\left [ 
+    \mu \left ( 
+        2 \frac{\partial u }{\partial  x }
+        - { \frac{2}{3} }  \mathop{\rm div}  \mathbf w 
+    \right )  
+\right ] 
++
+$$
+
+$$ 
++ 
+\frac \partial {\partial  y }
+\left [ 
+    \mu \left ( 
+        \frac{\partial u }{\partial  y }
+        + \frac{\partial v }{\partial  x }
+    \right )  
+\right ]
++ 
+\frac \partial {\partial  z }
+\left [ 
+    \mu \left ( 
+        \frac{\partial w }{\partial  x }
+        + \frac{\partial u }{\partial  z }
+    \right )  
+\right ],
+$$
+
+$$ 
+\rho 
+\frac{dv }{dt }
+= Y
+- \frac{\partial  p }{\partial y }
++ \frac \partial {\partial  y }
+\left [ 
+    \mu \left ( 
+        2 \frac{\partial v }{\partial  y }
+        - { \frac{2}{3} }  \mathop{\rm div}  \mathbf w 
+    \right )  
+\right ] 
++
+$$
+
+$$ 
++ 
+\frac \partial {\partial  z }
+\left [ 
+    \mu \left ( 
+        \frac{\partial v }{\partial  z }
+        + \frac{\partial w }{\partial  y }
+    \right )  
+\right ]
++ 
+\frac \partial {\partial  x }
+\left [ 
+    \mu \left ( 
+        \frac{\partial u }{\partial  y }
+        + \frac{\partial v }{\partial  x }
+    \right )  
+\right ],
+$$
+
+$$ 
+\rho 
+\frac{dw }{dt }
+= Z 
+- \frac{\partial  p }{\partial z }
++ \frac \partial {\partial  z }
+\left [ 
+    \mu \left ( 
+        2 \frac{\partial w }{\partial  z }
+        - { \frac{2}{3} }  \mathop{\rm div}  \mathbf w 
+    \right )  
+\right ] 
++
+$$
+
+$$ 
++ 
+\frac \partial {\partial  x }
+\left [ 
+    \mu \left ( 
+        \frac{\partial w }{\partial  x }
+        + \frac{\partial u }{\partial  z }
+    \right )  
+\right ]
++ 
+\frac \partial {\partial  y }
+\left [ 
+    \mu \left ( 
+        \frac{\partial v }{\partial  z }
+        + \frac{\partial w }{\partial  y }
+    \right )  
+\right ],
+$$
+
+$$ 
+\frac{\partial \rho }{\partial t}
++ \frac{\partial (\rho u) }{\partial x}
++ \frac{\partial (\rho v) }{\partial y}
++ \frac{\partial (\rho w) }{\partial z}
+= 0,
+$$
+
+gdzie:\newline
+w - wektor prędkości o rzutach u, v, w na osie współrzędnych x, y, z,\newline
+p - ciśnienie,\newline
+$\rho$ - gęstość,\newline
+$\mu$ - współczynnik lepkości,\newline
+X,Y,Z - rzuty wektora sił masowych K na osie współrzędnych,\newline
+(pochodna substancjonalna) - pochodna substancjonalna,\newline
+
+Równania są wyprowadzone na podstawie Newtonowskiego uogólnionego prawa tarcia.
+Analiza płynów ściśliwych wymaga dodatkowo zastosowania równań uwzględniających ciśnienie, gęstość, temperaturę i przepływy energii.
+Dla nieściśliwych izotermicznych płynów, równania przyjmują następującą formę:
+(wstaw równanie)
+
+
+\subsection{Metoda cząsteczkowa symulacji}
+\subsubsection{Równania Naviera-Stokesa}
+Przyjmijmy następującą formę równań dla cieczy nieściśliwych:
+(forma wiążąca)
+(zachowanie masy)
+
+Wykorzystanie metody cząsteczkowej pozwala na pewne uproszczenia, mianowicie:\newline
+(1) Stała liczba cząsteczek zapewnia zachowanie masy wewnątrz systemu\newline
+(2) wyrażenie (wstaw wyrażenie) może zostać zastąpione operatorem Stokesa(wstaw drugie). Ponieważ cząstki poruszają się wraz z płynem operator Stokesa pola prędkości jest pochodną czasu prędkości co znaczy, że wyrażenie (v*delta v) nie jest potrzebne.\newline
+
+
+
+\subsubsection{Modelowanie cząsteczkami}
+\subsubsection{Ciśnienie}
+\subsubsection{Gęstość}
+\subsubsection{Lepkość}
+\subsubsection{Funkcje wygładzania}
+
+\subsection{Odnajdywanie z wykorzystaniem skrótów}
+
+
+\section{Wyniki badań}
+\subsection{Odnajdywanie siłowe}
+\subsection{Odnajdywanie skrótem}
+\section{Podsumowanie}
+\section{Wnioski}
+\section{Bibliografia}
+
+\end{document}
