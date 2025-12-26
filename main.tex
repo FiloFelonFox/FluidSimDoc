@@ -17,13 +17,18 @@
 \author{ehhhhhhhhh}
 
 \begin{document}
+\maketitle
 \newpage
 \tableofcontents
+\newpage
 
 \section{Wstęp}
+Obliczenia numeryczne dotyczące symulacji płynów odgrywają kluczową rolę we współczesnej inżynierii i naukach techninych. Opiera się na nich wiele dziedzin oraz sektorów branżowych takich jak: inżynieria chemiczna, energetyka, lotnictwo, motoryzacja, meteorologia, a także przemysły growy i rozrywkowy. Dzięki nim możliwa jest uzyskanie zadawalających rezultatów przewidywania zachowania cieczy bez konieczności przeprowadzania czasochłonnych i skomplikowanych obliczeń bądź odwzorowywania układów o dużej złożoności.\newline\newline
+Wzrost dokładności modeli fizycznych oraz zapotrzebowań na rozdzielczość i wyprzedzenie dokonywanych obliczeń powoduje wzrost wymaganej mocy obliczeniowej i pamięci. Złożoność obliczeniowa problemu symulacji powoduje że istotnym ograniczeniem może być czas jej wykonania. Konsekwentnie wysokiego znaczenia nabierają metody optymalizacji, których celem jest ograniczenie wykorzystywanej pamięci oraz czasu koniecznego do przeprowadzenia obliczeń.\newline
 
 \section{Cel i zakres}
-Celem pracy jest stworzenie symulacji cząsteczkowej płynu opartej o równania Naviera-Stokesa oraz zbadanie wydajności zaproponowanej metody optymalizacji.
+Celem niniejszej pracy inżynierskiej jest zaproponowanie i analiza rozwiązań dotyczących optymalizacji symulacji płynów. Praca koncentruje się na rozwiązaniach dotyczących metod wyszukiwania cząstek sąsiadujących w metodzie cząstek wygładzonych (SPH) opartej o równania Naviera-Stokesa.\newline\newline
+Zakres pracy obejmuje omówienie podstaw teoretycznych dotyczących symulacji płynów, zaproponowanie metod optymalizacji i ich analizę teoretyczną, oraz przedstawienie wyników zastosowania tychże metod w praktyce. Uzyskane rezultaty mogą stanowić podstawę do dalszych badań na temat optymalizacji oraz praktycznego wykorzystania wypracowanych rozwiązań.\newline
 
 \section{Wstęp teoretyczny}
 \subsection{Równania Naviera-Stokesa}
@@ -160,28 +165,67 @@ Dla nieściśliwych izotermicznych płynów, równania przyjmują następującą
 
 \subsection{Metoda cząsteczkowa symulacji}
 \subsubsection{Równania Naviera-Stokesa}
-Przyjmijmy następującą formę równań dla cieczy nieściśliwych:
-(forma wiążąca)
-(zachowanie masy)
+Przyjmijmy następującą formę równań dla cieczy nieściśliwych:\newline
+(forma wiążąca)\newline
+(zachowanie masy)\newline
 
 Wykorzystanie metody cząsteczkowej pozwala na pewne uproszczenia, mianowicie:\newline
 (1) Stała liczba cząsteczek zapewnia zachowanie masy wewnątrz systemu\newline
 (2) wyrażenie (wstaw wyrażenie) może zostać zastąpione operatorem Stokesa(wstaw drugie). Ponieważ cząstki poruszają się wraz z płynem operator Stokesa pola prędkości jest pochodną czasu prędkości co znaczy, że wyrażenie (v*delta v) nie jest potrzebne.\newline
+Oznacza to że równanie przyjmuje następującą formę:\newline
+(równanie)\newline
+Prawa strona równania składa się z trzech składowych:\newline
+(-delta p) - odwrotność gradientu ciśnienia\newline
+Odpowiada za siły wynikające z miejscowych różnic w ciśnieniu wewnątrz płynu.\newline
+Współczynnik ten odpowiada za ruch miejscowy płynu podyktowany gradientem ciśnienia, powodując dążenie do wyrównania ciśnienia w ośrodku.\newline
+(równanie) - siły zewnętrzne\newline
+Odpowiadają siłom jednorodnym w symulowanej przestrzeni. Dotyczą one sił zewnętrznych jak grawitacja, a w przypadku symulacji objętości płynów poddawanych innym przyśpieszeniom wynikającym na przykład z ruchu ośrodka, również takowym.\newline
+Ponieważ zastosowana wersja symulacji nie zakłada sił innych niż siła grawitacji równanie wygląda następująco:\newline
+(rho g)\newline
+(równanie) - siły lepkości\newline
+Siły powodujące wygładzenie pola prędkości płynu spowodowane jego lepkością.\newline
 
 
+\subsubsection{Metoda cząstek wygładzonych}
+Metoda cząstek wygładzonych (ang. Smoothed Particle Hydrophysics - SPH) to bezsiatkowa metoda numeryczna stosowana do symulacji przepływów płynów i innych zjawisk ciągłych. Pierwotnie opracowana do symulacji zjawisk astrofizycznych aktualnie znajduje zastsowanie m.in. w mechanice płynów, inżynierii materiałowej, czy grafice komputerowej. Brak zastosowania siatki obliczeniowej jest dużą zaletą tej metody, pozwalającą na modelowanie znacznych deformacji, swobodnych powierzchni i zjawisk nieciągłych.\newline\newline
+W metodzie tej ośrodek ciągły jest reprezentowany jako zbiór dyskretnych cząstek, które zawierają informację o lokalnych wartościach pól takich jak masa, gęstość, prędkość itp. Każda z cząstek oddziałowuje jedynie z cząstkami które znajdują się w jej bezpośrednim sąsiedztwie określonym przez promień wygładzania $h$. Wartości pól w danym punkcie przestrzeni są aproksymowane za pomocą funkcji wygładzającej, która dyktuje wagę z jaką uwzględniany jest wkład cząstek sąsiadujących w zależności od odległości.\newline\newline
+Podstawą metody jest przybliżenie całki opisującej wielkość fizyczną w postaci sumy po cząstkach:\newline
+$$
+A(r) \approx \sum_{j}A_j \frac{m_j}{\rho_j}W(r-r_j,h),
+$$
+Gdzie:\newline
+A - dowolna wielkość fizyczna,\newline
+m - masa cząstki,\newline
+$\rho$ - gęstość w punkcie cząstki,\newline
+W - funkcja wygładzająca\newline
+r - odległość od cząstki,\newline
+h - odległość oddziaływania,\newline\newline
+Równania opisujące zmiany stanu cząstek, takie jak równania Naviera-Stokesa są w metodzie SPH zapisywane w postaci dyskretnej, w oparciu o tą właśnie metodę obliczania wartości fizycznej w punkcie.\newline
+Do zalet metody SPH należy prostota jej implementacji, łatwość zrównoleglenia oraz możliwość modelowania zjawisk z ruchomymi granicami.\newline
+Głównymi wadami są natomiast wysoka złożoność obliczeniowa spowodowana koniecznością wyszukiwania cząstek sąsiadujących i problemy wynikające z trudności zachowania stabilności numerycznej oraz możliwa niska dokładność przy nieodpowiednich parametrach.\newline
+Dlatego też metoda SPH wymaga zastosowania technik optymalizacyjnych i doboru odpowiednich parametrów symulacji.\newline
 
-\subsubsection{Modelowanie cząsteczkami}
+
 \subsubsection{Ciśnienie}
 \subsubsection{Gęstość}
 \subsubsection{Lepkość}
 \subsubsection{Funkcje wygładzania}
+Metoda wygładzonych cząstek opiera się na funkcjach wygładzania. Są to funkcje określające wzajemny wpływ cząstek w zależności od odległości.\newline
+Funkcje wygładzania można traktować jako funkcje jednej zmiennej 
+W(r) = r>h lub ...\newline
+gdzie:\newline
+r - odległość analizowanej cząstki od cząstki sąsiadującej\newline
+h - maksymalna odległość interakcji\newline
+Jest to forma zakładająca stałą maksymalną odległość interakcji, co powoduje ograniczenia w dowolności konfiguracji symulacji.\newline
+Alternatywną i zazwyczaj stosowaną formą jest wyrażenie funkcji wygładzania jako funkcji dwóch zmiennych
 
-\subsection{Odnajdywanie z wykorzystaniem skrótów}
-
-
-\section{Wyniki badań}
 \subsection{Odnajdywanie siłowe}
 \subsection{Odnajdywanie skrótem}
+\subsection{Metody drzewiaste}
+
+\section{Obliczenia wydajności}
+\section{Symulacja}
+\section{Wyniki badań}
 \section{Podsumowanie}
 \section{Wnioski}
 \section{Bibliografia}
