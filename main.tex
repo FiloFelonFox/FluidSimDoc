@@ -13,6 +13,9 @@
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
 \title{Praca inżynierska}
 \author{ehhhhhhhhh}
 
@@ -160,29 +163,49 @@ X,Y,Z - rzuty wektora sił masowych K na osie współrzędnych,\newline
 Równania są wyprowadzone na podstawie Newtonowskiego uogólnionego prawa tarcia.
 Analiza płynów ściśliwych wymaga dodatkowo zastosowania równań uwzględniających ciśnienie, gęstość, temperaturę i przepływy energii.
 Dla nieściśliwych izotermicznych płynów, równania przyjmują następującą formę:
-(wstaw równanie)
+$$
+\rho \frac {dw}{dt}
+= \boldsymbol{K} - grad \space \rho
++ \mu \Delta \boldsymbol{w},
+$$
+$$
+div \space \boldsymbol{w} = 0.
+$$
 
 
 \subsection{Metoda cząsteczkowa symulacji}
 \subsubsection{Równania Naviera-Stokesa}
 Przyjmijmy następującą formę równań dla cieczy nieściśliwych:\newline
-(forma wiążąca)\newline
-(zachowanie masy)\newline
+$$
+\rho \left (
+    \frac{\partial v}{\partial t} + v \nabla v
+\right )
+= - \nabla p + \rho f_{zew} + \mu \nabla^2v,
+$$
+$$
+\frac{\partial \rho}{\partial t} + \nabla(\rho v) = 0
+$$
 
 Wykorzystanie metody cząsteczkowej pozwala na pewne uproszczenia, mianowicie:\newline
 (1) Stała liczba cząsteczek zapewnia zachowanie masy wewnątrz systemu\newline
-(2) wyrażenie (wstaw wyrażenie) może zostać zastąpione operatorem Stokesa(wstaw drugie). Ponieważ cząstki poruszają się wraz z płynem operator Stokesa pola prędkości jest pochodną czasu prędkości co znaczy, że wyrażenie (v*delta v) nie jest potrzebne.\newline
+(2) wyrażenie (wstaw wyrażenie) może zostać zastąpione operatorem Stokesa(wstaw drugie). Ponieważ cząstki poruszają się wraz z płynem operator Stokesa pola prędkości jest pochodną czasu prędkości co znaczy, że wyrażenie $v \nabla v$ nie jest potrzebne.\newline
 Oznacza to że równanie przyjmuje następującą formę:\newline
-(równanie)\newline
+$$
+\rho \frac{D v}{D t}
+= - \nabla p + \rho f_{zew} + \mu \nabla^2v,
+$$
 Prawa strona równania składa się z trzech składowych:\newline
-(-delta p) - odwrotność gradientu ciśnienia\newline
+$- \nabla p$- odwrotność gradientu ciśnienia\newline
 Odpowiada za siły wynikające z miejscowych różnic w ciśnieniu wewnątrz płynu.\newline
 Współczynnik ten odpowiada za ruch miejscowy płynu podyktowany gradientem ciśnienia, powodując dążenie do wyrównania ciśnienia w ośrodku.\newline
-(równanie) - siły zewnętrzne\newline
+$\rho f_{zew}$ - siły zewnętrzne\newline
 Odpowiadają siłom jednorodnym w symulowanej przestrzeni. Dotyczą one sił zewnętrznych jak grawitacja, a w przypadku symulacji objętości płynów poddawanych innym przyśpieszeniom wynikającym na przykład z ruchu ośrodka, również takowym.\newline
 Ponieważ zastosowana wersja symulacji nie zakłada sił innych niż siła grawitacji równanie wygląda następująco:\newline
-(rho g)\newline
-(równanie) - siły lepkości\newline
+$$
+\rho \frac{D v}{D t}
+= - \nabla p + \rho g + \mu \nabla^2v,
+$$
+$\mu \nabla^2v$ - siły lepkości\newline
 Siły powodujące wygładzenie pola prędkości płynu spowodowane jego lepkością.\newline
 
 
@@ -207,20 +230,143 @@ Dlatego też metoda SPH wymaga zastosowania technik optymalizacyjnych i doboru o
 
 
 \subsubsection{Ciśnienie}
-\subsubsection{Gęstość}
+Zastosowanie metody SPH dla ciśnienia opisanego jako wyrażenie $- \nabla p$:
+$$
+f_i = -\sum_j m_j \frac{p_j}{\rho_j}\nabla W(r_i - r_j, h),
+$$
+Wstępna analiza równania pozwala zauważyć, że dla dwóch oddziałujących cząstek siła ta nie jest symetryczna. Jest to spowodowane możliwością wystąpienia różnicy ciśnień w miejscach dwóch cząstek. Istnieje wiele metod wyrównania tych sił. Jedną z nich jest proste uśrednienie wartości ciśnienia tychże cząstek:\newline
+$$
+f_i = -\sum_j m_j \frac{p_j + p_i}{2\rho_j}\nabla W(r_i - r_j, h),
+$$
+Ciśnienie p wyznaczane jest równaniem gazu idealnego:\newline
+$$
+p=k\rho
+$$
+gdzie k to stała gazu zależna od temperatury.\newline
+Desburn sugeruje wykorzystanie zmodyfikowanej wersji równania:\newline
+$$
+p=k(\rho - \rho_0)
+$$
+gdzie $\rho_0$ jest gęstością spoczynku.\newline
+Pozwala to na wyznaczenie gęstości do której dążyć będzie symulowany płyn jako łatwo modyfikowalny parametr.\newline
+Ponieważ równania zależą od gradientu ciśnienia, przesunięcie nie wpływa na obliczenia siły.
+
+\subsubsection{Siły zewnętrzne}
+Obliczenia dla siły grawitacji ograniczają się do prostego równania:\newline
+$$
+f_i = g
+$$
 \subsubsection{Lepkość}
+Wyrażenie dla lepkości $\mu \nabla^2v$ przekształcone do sumy:\newline
+$$
+f_i = \mu\sum_j m_j \frac{v_j}{\rho_j}\nabla^2W(r_i-r_j,h)
+$$
+Jak widać również skutkuje siłami asymetrycznymi. Ponieważ siły te operują na różnicach prędkości, naturalnym jest usymetryzowanie ich na różnicach prędkości:\newline
+$$
+f_i = \mu\sum_j m_j \frac{v_j-v_i}{\rho_j}\nabla^2W(r_i-r_j,h)
+$$
+
 \subsubsection{Funkcje wygładzania}
 Metoda wygładzonych cząstek opiera się na funkcjach wygładzania. Są to funkcje określające wzajemny wpływ cząstek w zależności od odległości.\newline
 Funkcje wygładzania można traktować jako funkcje jednej zmiennej 
-W(r) = r>h lub ...\newline
+$$
+W(r) = 
+\begin{cases}
+f(r,h), & dla \space r<h,\\
+0,    & dla \space r>=h
+\end{cases}
+$$
 gdzie:\newline
 r - odległość analizowanej cząstki od cząstki sąsiadującej\newline
 h - maksymalna odległość interakcji\newline
+f - funkcja kształtu krzywej\newline
 Jest to forma zakładająca stałą maksymalną odległość interakcji, co powoduje ograniczenia w dowolności konfiguracji symulacji.\newline
-Alternatywną i zazwyczaj stosowaną formą jest wyrażenie funkcji wygładzania jako funkcji dwóch zmiennych
+Alternatywną i zazwyczaj stosowaną formą jest wyrażenie funkcji wygładzania jako funkcji dwóch zmiennych:\newline
+$$
+W(r,h) = 
+\begin{cases}
+m(h)f(r,h), & dla \space r<h,\\
+0,    & dla \space r>=h
+\end{cases}
+$$
+Gdzie m to funkcja maksymalnej odległości interakcji, która służy jako współczynnik standaryzujący. Jej celem jest zachowanie stałej wartości całki funkcj wygładzającej. W przypadku jej niezastosowania zwiększenie odległości interakcji celem wygładzenia wartości pola spowoduje gwałtowny wzrost wartości. Istnienie współczynnika pozwala na swobodniejszą manipulację odległością interakcji, bez niepożądanych zachowań.\newline
+Funkcja m jest określona poniższym wzorem:\newline
+$$
+\frac {\pi h \int_0^h{f(r,h)}}{m(h)} = const
+$$
 
+Dodatkowo w metodzie SPH wykorzystujemy pochodne funkcj wygładzających $\frac {dW(r,h)}{dr}$ celem wyznaczenia gradientów pól cech fizycznych.\newline
+
+\section{Metody odnajdywania cząstek}
 \subsection{Odnajdywanie siłowe}
-\subsection{Odnajdywanie skrótem}
+Najprostszym sposobem odnajdywania cząstek sąsiadujących jest użycie metody siłowej (eng. brute-force). Metoda polega na przeszukaniu zbioru cząstek i sprawdzenia odległości od cząstki aktualnie analizowanej.\newline
+Oznacza to że dla każdej możliwej pary cząstek konieczne jest wykonanie prównania odległości z maksymalną odległością interakcji:\newline
+$$
+||r_i-r_j|| \leq h.
+$$
+
+Jeśli warunek zostanie spełniony to znaczy, że cząstka j jest w sąsiedztwie czątki i i zostaje uwzględniona w dalszych obliczeniach.\newline
+
+Postać algorytmiczna wyszukiwania metodą siłową:\newline
+
+\begin{algorithm}
+\caption{Metoda siłowa}
+\begin{algorithmic}[1]
+void CalculateViscosity(uint3 id : SV_DispatchThreadID)\\
+{\\
+	if (id.x >= numParticles)\\
+		return;\\
+        for (uint secondParticleIndex = 0;\\ secondParticleIndex < numParticles; secondParticleIndex++)\\
+	{\\
+			if (secondParticleIndex == id.x)\\
+				continue;\\
+			if (sqrDstToSecondParticle > sqrSmoothingRadius)\\
+				continue;\\
+            wykonaj_obliczenia();\\
+    }\\
+}
+\end{algorithmic}
+\end{algorithm}
+
+
+Złożoność obliczeniowa metody siłowej odnajdywania czątek wynosi $O(N^2)$, co oznacza kwadratowy wzrost liczby operacji w stosunku do liczby cząstek.\newline
+Metoda ta jest łatwa w implementacji oraz nie wymaga dodatkowych struktur, przez co może zostać wykorzystana w stosunkowo niewielkich symulacjach służących do demonstracji lub nauki.\newline
+W zastosowaniach praktycznych metody SPH, gdzie liczba cząstek sięga tysiący, bądź milionów, siłowe odnajdywanie jest niewystarczające przez wzgląd na znaczący czas obliczeń.\newline
+
+
+\subsection{Siatka jednorodna}
+Jednym z rozwiązań mających na celu przyśpieszenie procesu wyszukiwania cząstek sąsiadujących jest zastosowanie siatki jednorodnej (eng. uniform grid).\newline
+Metoda ta polega na podziale przestrzeni na regularne komórki o stałym rozmiarze. Rozmiar komórki dostosowywany jest do odległości interakcji h. Uzależnienie to pozwala ustalić stałą, ograniczoną liczbę komórek które należy przeszukać.\newline
+Każdej cząstce przypisywana jest komórka siatki na podstawie jej pozycji:\newline
+$$
+i_n = \frac {x_n} r
+$$
+Gdzie:\newline
+$i_n$ - indeks cząstki w wymiarze $n$\newline
+$x_n$ - położenie cząstki wzdłuż osi $n$\newline
+$r$ - wielkość komórki siatki\newline\newline
+Na podstawie danego wzoru algorytm przypisywania komórki wygląda następująco:\newline
+[algorytm przypisywania komórki]\newline
+W takim przypadku liczba operacji koniecznych do stworzenia struktury wynosi:\newline
+[wzór na liczbę operacji]\newline
+Najczęściej wartość r jest równa, lub nieznacznie większa od odległości interakcji co ogranicza ilość koniecznycj do sprawdzenia komórek wzorem:\newline
+$$
+n_s = 3^d
+$$
+Gdzie:\newline
+$n_s$ - liczba komórek koniecznych do sprawdzenia\newline
+$d$ - liczba wymiarów symulacji\newline
+
+Zastosowanie siatki pozwala uzależnić złożoność obliczeniową algorytmu od liczby cząstek oczekiwanej wewnątrz sąsiadujących komórek siatki, zamiast od całkowitej liczby cząstek.\newline
+
+\begin{algorithm}
+\caption{Wykorzystanie siatki}
+\begin{algorithmic}[1]
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Haszowanie przestrzenne}
+\subsection{Stały indeks}
 \subsection{Metody drzewiaste}
 
 \section{Obliczenia wydajności}
