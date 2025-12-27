@@ -26,20 +26,38 @@
 \newpage
 
 \section{Wstęp}
-Obliczenia numeryczne dotyczące symulacji płynów odgrywają kluczową rolę we współczesnej inżynierii i naukach techninych. Opiera się na nich wiele dziedzin oraz sektorów branżowych takich jak: inżynieria chemiczna, energetyka, lotnictwo, motoryzacja, meteorologia, a także przemysły growy i rozrywkowy. Dzięki nim możliwa jest uzyskanie zadawalających rezultatów przewidywania zachowania cieczy bez konieczności przeprowadzania czasochłonnych i skomplikowanych obliczeń bądź odwzorowywania układów o dużej złożoności.\newline\newline
-Wzrost dokładności modeli fizycznych oraz zapotrzebowań na rozdzielczość i wyprzedzenie dokonywanych obliczeń powoduje wzrost wymaganej mocy obliczeniowej i pamięci. Złożoność obliczeniowa problemu symulacji powoduje że istotnym ograniczeniem może być czas jej wykonania. Konsekwentnie wysokiego znaczenia nabierają metody optymalizacji, których celem jest ograniczenie wykorzystywanej pamięci oraz czasu koniecznego do przeprowadzenia obliczeń.\newline
+Obliczenia numeryczne dotyczące symulacji płynów odgrywają kluczową rolę we współczesnej inżynierii i naukach techninych. 
+Opiera się na nich wiele dziedzin oraz sektorów branżowych takich jak: inżynieria chemiczna, energetyka, lotnictwo, motoryzacja, meteorologia, a także przemysły growy i rozrywkowy. 
+Dzięki nim możliwa jest uzyskanie zadawalających rezultatów przewidywania zachowania cieczy bez konieczności przeprowadzania czasochłonnych i skomplikowanych obliczeń 
+bądź odwzorowywania układów o dużej złożoności.\newline\newline
+
+Wzrost dokładności modeli fizycznych oraz zapotrzebowań na rozdzielczość i wyprzedzenie dokonywanych obliczeń powoduje wzrost wymaganej mocy obliczeniowej i pamięci. 
+Złożoność obliczeniowa problemu symulacji powoduje że istotnym ograniczeniem może być czas jej wykonania. Konsekwentnie wysokiego znaczenia nabierają metody optymalizacji, 
+których celem jest ograniczenie wykorzystywanej pamięci oraz czasu koniecznego do przeprowadzenia obliczeń.\newline
 
 \section{Cel i zakres}
-Celem niniejszej pracy inżynierskiej jest zaproponowanie i analiza rozwiązań dotyczących optymalizacji symulacji płynów. Praca koncentruje się na rozwiązaniach dotyczących metod wyszukiwania cząstek sąsiadujących w metodzie cząstek wygładzonych (SPH) opartej o równania Naviera-Stokesa.\newline\newline
-Zakres pracy obejmuje omówienie podstaw teoretycznych dotyczących symulacji płynów, zaproponowanie metod optymalizacji i ich analizę teoretyczną, oraz przedstawienie wyników zastosowania tychże metod w praktyce. Uzyskane rezultaty mogą stanowić podstawę do dalszych badań na temat optymalizacji oraz praktycznego wykorzystania wypracowanych rozwiązań.\newline
+Celem niniejszej pracy inżynierskiej jest zaproponowanie i analiza rozwiązań dotyczących optymalizacji symulacji płynów. 
+Praca koncentruje się na rozwiązaniach dotyczących metod wyszukiwania cząstek sąsiadujących w metodzie cząstek wygładzonych (SPH) opartej o równania Naviera-Stokesa.\newline\newline
+
+Zakres pracy obejmuje omówienie podstaw teoretycznych dotyczących symulacji płynów, zaproponowanie metod optymalizacji i ich analizę teoretyczną, 
+oraz przedstawienie wyników zastosowania tychże metod w praktyce. Uzyskane rezultaty mogą stanowić podstawę do dalszych badań na temat optymalizacji 
+oraz praktycznego wykorzystania wypracowanych rozwiązań.\newline
 
 \section{Wstęp teoretyczny}
 \subsection{Równania Naviera-Stokesa}
-Równania Naviera–Stokesa stanowią podstawowy zestaw równań opisujących ruch płynów, zarówno cieczy, jak i gazów. Ich sformułowanie opiera się na zasadzie zachowania pędu, zgodnie z którą zmiany pędu elementarnej objętości płynu wynikają z oddziaływania sił działających na ten element. Równania zakładają że zmiany zależą od sił lepkości, sił wynikających z ciśnienia oraz sił masowe, takich jak siła grawitacji.\newline
+Równania Naviera–Stokesa stanowią podstawowy zestaw równań opisujących ruch płynów, zarówno cieczy, jak i gazów. 
+Ich sformułowanie opiera się na zasadzie zachowania pędu, zgodnie z którą zmiany pędu elementarnej objętości płynu wynikają z oddziaływania sił działających na ten element. 
+Równania zakładają że zmiany zależą od sił lepkości, sił wynikających z ciśnienia oraz sił masowe, takich jak siła grawitacji.\newline
 
-Równania zapisane są w postaci równań różniczkowych cząstkowych i do ich rozwiązania niezbędne jest zastosowanie narzędzi rachunku różniczkowego i całkowego. Przez wzgląd na swoją nieliniowość oraz sprzężenie pomiędzy składowymi prędkości, ich rozwiązanie stanowi istotne wyzwanie obliczeniowe, co powoduje, że uzyskanie rozwiązań drogą analityczną jest realistyczne jedynie w najprostszych przypadkach, takich jak ustalony, laminarny i nieturbulentny przepływ w geometriach prostych.\newline
+Równania zapisane są w postaci równań różniczkowych cząstkowych i do ich rozwiązania niezbędne jest zastosowanie narzędzi rachunku różniczkowego i całkowego. 
+Przez wzgląd na swoją nieliniowość oraz sprzężenie pomiędzy składowymi prędkości, ich rozwiązanie stanowi istotne wyzwanie obliczeniowe, co powoduje, 
+że uzyskanie rozwiązań drogą analityczną jest realistyczne jedynie w najprostszych przypadkach, takich jak ustalony, laminarny i nieturbulentny przepływ w geometriach prostych.\newline
 
-W przypadkach bardziej złożonych zagadnień, w szczególności przepływów niestacjonarnych, trójwymiarowych lub turbulentnych, stosowanych m.in. w obliczeniach aerodynamicznych i inżynierskich, konieczne jest wykorzystanie metod numerycznych. Metody te, implementowane w narzędziach obliczeniowej mechaniki płynów (CFD), umożliwiają przybliżone rozwiązanie równań Naviera–Stokesa i analizę rzeczywistych zjawisk przepływowych, które nie są możliwe do opisania metodami analitycznymi.\newline
+W przypadkach bardziej złożonych zagadnień, w szczególności przepływów niestacjonarnych, trójwymiarowych lub turbulentnych, 
+stosowanych m.in. w obliczeniach aerodynamicznych i inżynierskich, konieczne jest wykorzystanie metod numerycznych. 
+Metody te, implementowane w narzędziach obliczeniowej mechaniki płynów (CFD), umożliwiają przybliżone rozwiązanie równań Naviera–Stokesa i analizę rzeczywistych zjawisk przepływowych, 
+które nie są możliwe do opisania metodami analitycznymi.\newline
+
 Zapis równań Naviera-Stokesa w kartezjańskim układzie współrzędnych wygląda następująco:
 
 $$ 
@@ -162,7 +180,7 @@ X,Y,Z - rzuty wektora sił masowych K na osie współrzędnych,\newline
 
 Równania są wyprowadzone na podstawie Newtonowskiego uogólnionego prawa tarcia.
 Analiza płynów ściśliwych wymaga dodatkowo zastosowania równań uwzględniających ciśnienie, gęstość, temperaturę i przepływy energii.
-Dla nieściśliwych izotermicznych płynów, równania przyjmują następującą formę:
+Dla nieściśliwych izotermicznych płynów, równania przyjmują następującą formę:\newline
 $$
 \rho \frac {dw}{dt}
 = \boldsymbol{K} - grad \space \rho
@@ -188,7 +206,8 @@ $$
 
 Wykorzystanie metody cząsteczkowej pozwala na pewne uproszczenia, mianowicie:\newline
 (1) Stała liczba cząsteczek zapewnia zachowanie masy wewnątrz systemu\newline
-(2) wyrażenie (wstaw wyrażenie) może zostać zastąpione operatorem Stokesa(wstaw drugie). Ponieważ cząstki poruszają się wraz z płynem operator Stokesa pola prędkości jest pochodną czasu prędkości co znaczy, że wyrażenie $v \nabla v$ nie jest potrzebne.\newline
+(2) wyrażenie (wstaw wyrażenie) może zostać zastąpione operatorem Stokesa(wstaw drugie). 
+Ponieważ cząstki poruszają się wraz z płynem operator Stokesa pola prędkości jest pochodną czasu prędkości co znaczy, że wyrażenie $v \nabla v$ nie jest potrzebne.\newline
 Oznacza to że równanie przyjmuje następującą formę:\newline
 $$
 \rho \frac{D v}{D t}
@@ -223,9 +242,11 @@ $\rho$ - gęstość w punkcie cząstki,\newline
 W - funkcja wygładzająca\newline
 r - odległość od cząstki,\newline
 h - odległość oddziaływania,\newline\newline
-Równania opisujące zmiany stanu cząstek, takie jak równania Naviera-Stokesa są w metodzie SPH zapisywane w postaci dyskretnej, w oparciu o tą właśnie metodę obliczania wartości fizycznej w punkcie.\newline
+Równania opisujące zmiany stanu cząstek, takie jak równania Naviera-Stokesa są w metodzie SPH zapisywane w postaci dyskretnej, 
+w oparciu o tą właśnie metodę obliczania wartości fizycznej w punkcie.\newline
 Do zalet metody SPH należy prostota jej implementacji, łatwość zrównoleglenia oraz możliwość modelowania zjawisk z ruchomymi granicami.\newline
-Głównymi wadami są natomiast wysoka złożoność obliczeniowa spowodowana koniecznością wyszukiwania cząstek sąsiadujących i problemy wynikające z trudności zachowania stabilności numerycznej oraz możliwa niska dokładność przy nieodpowiednich parametrach.\newline
+Głównymi wadami są natomiast wysoka złożoność obliczeniowa spowodowana koniecznością wyszukiwania cząstek sąsiadujących 
+i problemy wynikające z trudności zachowania stabilności numerycznej oraz możliwa niska dokładność przy nieodpowiednich parametrach.\newline
 Dlatego też metoda SPH wymaga zastosowania technik optymalizacyjnych i doboru odpowiednich parametrów symulacji.\newline
 
 
@@ -234,7 +255,9 @@ Zastosowanie metody SPH dla ciśnienia opisanego jako wyrażenie $- \nabla p$:
 $$
 f_i = -\sum_j m_j \frac{p_j}{\rho_j}\nabla W(r_i - r_j, h),
 $$
-Wstępna analiza równania pozwala zauważyć, że dla dwóch oddziałujących cząstek siła ta nie jest symetryczna. Jest to spowodowane możliwością wystąpienia różnicy ciśnień w miejscach dwóch cząstek. Istnieje wiele metod wyrównania tych sił. Jedną z nich jest proste uśrednienie wartości ciśnienia tychże cząstek:\newline
+Wstępna analiza równania pozwala zauważyć, że dla dwóch oddziałujących cząstek siła ta nie jest symetryczna. 
+Jest to spowodowane możliwością wystąpienia różnicy ciśnień w miejscach dwóch cząstek. Istnieje wiele metod wyrównania tych sił. 
+Jedną z nich jest proste uśrednienie wartości ciśnienia tychże cząstek:\newline
 $$
 f_i = -\sum_j m_j \frac{p_j + p_i}{2\rho_j}\nabla W(r_i - r_j, h),
 $$
@@ -249,14 +272,81 @@ p=k(\rho - \rho_0)
 $$
 gdzie $\rho_0$ jest gęstością spoczynku.\newline
 Pozwala to na wyznaczenie gęstości do której dążyć będzie symulowany płyn jako łatwo modyfikowalny parametr.\newline
-Ponieważ równania zależą od gradientu ciśnienia, przesunięcie nie wpływa na obliczenia siły.
+Ponieważ równania zależą od gradientu ciśnienia, przesunięcie nie wpływa na obliczenia siły.\newline
+
+Postać kodowa równania ciśnienia z uwzględnieniem symetryzacji sił wygląda następująco:\newline
+\begin{algorithm}
+\caption{Obliczenia ciśnienia}
+\begin{algorithmic}[1]
+void CalculatePressureForce(uint3 id : SV_DispatchThreadID)\\
+{\\
+	if (id.x >= numParticles)\\
+		return;\\
+\\
+	float density = Densities[id.x][0];\\
+	float densityNear = Densities[id.x][1];\\
+	float pressure = PressureFromDensity(density);\\
+	float nearPressure = NearPressureFromDensity(densityNear);\\
+	float2 pressureForce = 0;\\
+	\\
+	float2 position = PredictedPositions[id.x];\\
+	float sqrSmoothingRadius = smoothingRadius * smoothingRadius;\\
+\\
+	for (uint secondParticleIndex = 0; secondParticleIndex < numParticles; secondParticleIndex++)\\
+	{\\
+			if (secondParticleIndex == id.x)\\
+				continue;\\
+\\
+			float2 secondParticlePosition = PredictedPositions[secondParticleIndex];\\
+			float2 vectorToSecondParticle = secondParticlePosition - position;\\
+			float sqrDstToSecondParticle = dot(vectorToSecondParticle, vectorToSecondParticle);\\
+\\
+			if (sqrDstToSecondParticle > sqrSmoothingRadius)\\
+				continue;\\
+\\
+			float distanceToSecondParticle = sqrt(sqrDstToSecondParticle);\\
+			float2 interractionDirection = distanceToSecondParticle > 0 ? vectorToSecondParticle / distanceToSecondParticle : float2(0, 1);\\
+\\
+			float secondParticlePressure = PressureFromDensity(Densities[secondParticleIndex][0]);\\
+			float secondParticleNearPressure = NearPressureFromDensity(Densities[secondParticleIndex][1]);\\
+\\
+			float sharedPressure = (pressure + secondParticlePressure) * 0.5;\\
+			float sharedNearPressure = (nearPressure + secondParticleNearPressure) * 0.5;\\
+\\
+			pressureForce += interractionDirection * DensityDerivative(distanceToSecondParticle, smoothingRadius) * sharedPressure / Densities[secondParticleIndex][0];\\
+			pressureForce += interractionDirection * NearDensityDerivative(distanceToSecondParticle, smoothingRadius) * sharedNearPressure / Densities[secondParticleIndex][1];\\
+	}\\
+	float2 acceleration = pressureForce / density;\\
+	Velocities[id.x] += acceleration * timeStep;\\
+}\\
+\end{algorithmic}
+\end{algorithm}
 
 \subsubsection{Siły zewnętrzne}
 Obliczenia dla siły grawitacji ograniczają się do prostego równania:\newline
 $$
 f_i = g
 $$
-\subsubsection{Lepkość}
+
+W kodzie:\newline
+\begin{algorithm}
+\caption{Obliczenia siły grawitacji}
+\begin{algorithmic}[1]
+void CalculateExternalForces(uint3 id : SV_DispatchThreadID)\\
+{\\
+	if (id.x >= numParticles)\\
+		return;\\
+\\
+	Velocities[id.x] += ExternalForces(Positions[id.x], Velocities[id.x]) * timeStep;\\
+}\\
+\\
+float2 ExternalForces(float2 pos, float2 velocity)\\
+{\\
+	// Gravity\\
+	return float2(0, gravity);\\
+}\\
+\end{algorithmic}
+\end{algorithm}
 Wyrażenie dla lepkości $\mu \nabla^2v$ przekształcone do sumy:\newline
 $$
 f_i = \mu\sum_j m_j \frac{v_j}{\rho_j}\nabla^2W(r_i-r_j,h)
@@ -265,6 +355,55 @@ Jak widać również skutkuje siłami asymetrycznymi. Ponieważ siły te operuj�
 $$
 f_i = \mu\sum_j m_j \frac{v_j-v_i}{\rho_j}\nabla^2W(r_i-r_j,h)
 $$
+
+Kod:\newline
+\begin{algorithm}
+\caption{Obliczenia lepkości}
+\begin{algorithmic}[1]
+	void CalculateViscosity(uint3 id : SV_DispatchThreadID)\\
+{\\
+	if (id.x >= numParticles)\\
+		return;\\
+	\\
+	float2 position = PredictedPositions[id.x];\\
+	float sqrSmoothingRadius = smoothingRadius * smoothingRadius;\\
+\\
+	float2 viscosityForce = 0;\\
+	float2 velocity = Velocities[id.x];\\
+\\
+	for (uint secondParticleIndex = 0; secondParticleIndex < numParticles; secondParticleIndex++)\\
+	{\\
+			if (secondParticleIndex == id.x)\\
+				continue;\\
+\\
+			float2 secondParticlePosition = PredictedPositions[secondParticleIndex];\\
+			float2 vectorToSecondParticle = secondParticlePosition - position;\\
+			float sqrDstToSecondParticle = dot(vectorToSecondParticle, vectorToSecondParticle);\\
+\\
+			if (sqrDstToSecondParticle > sqrSmoothingRadius)\\
+				continue;\\
+\\
+			float distanceToSecondParticle = sqrt(sqrDstToSecondParticle);\\
+			float2 secondParticleVelocity = Velocities[secondParticleIndex];\\
+			viscosityForce += (secondParticleVelocity - velocity) * ViscosityKernel(distanceToSecondParticle, smoothingRadius);\\
+	}\\
+	Velocities[id.x] += viscosityForce * viscosityStrength * timeStep;\\
+}\\
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Bliska gęstość}
+W celu poprawy stabilności symulacji stosuje się dodatkowe wyrażenie odpowiadające za bliską gęstość cząstek. 
+Jego celem jest zapobieganie zbyt dużemu zbliżaniu się cząstek do siebie.\newline
+Wyrażenie to ma postać:\newline
+$$
+f_i = -k_{near}\sum_j m_j \frac{1}{\rho_j}\nabla W(r_i - r_j, h),
+$$
+Gdzie $k_{near}$ to współczynnik siły bliskiej gęstości.\newline
+Bliska gęstość pozwala na uzyskanie bardziej realistycznego zachowania płynu poprzez zapobieganie nadmiernemu zagęszczeniu cząstek, 
+co powoduje przybliżenie zachowania symulacji do płynów niesprężystych.\newline
+
+[tu wstaw kod bliskiej gęstości]\newline
 
 \subsubsection{Funkcje wygładzania}
 Metoda wygładzonych cząstek opiera się na funkcjach wygładzania. Są to funkcje określające wzajemny wpływ cząstek w zależności od odległości.\newline
@@ -289,7 +428,9 @@ m(h)f(r,h), & dla \space r<h,\\
 0,    & dla \space r>=h
 \end{cases}
 $$
-Gdzie m to funkcja maksymalnej odległości interakcji, która służy jako współczynnik standaryzujący. Jej celem jest zachowanie stałej wartości całki funkcj wygładzającej. W przypadku jej niezastosowania zwiększenie odległości interakcji celem wygładzenia wartości pola spowoduje gwałtowny wzrost wartości. Istnienie współczynnika pozwala na swobodniejszą manipulację odległością interakcji, bez niepożądanych zachowań.\newline
+Gdzie m to funkcja maksymalnej odległości interakcji, która służy jako współczynnik standaryzujący. Jej celem jest zachowanie stałej wartości całki funkcj wygładzającej. 
+W przypadku jej niezastosowania zwiększenie odległości interakcji celem wygładzenia wartości pola spowoduje gwałtowny wzrost wartości. 
+Istnienie współczynnika pozwala na swobodniejszą manipulację odległością interakcji, bez niepożądanych zachowań.\newline
 Funkcja m jest określona poniższym wzorem:\newline
 $$
 \frac {\pi h \int_0^h{f(r,h)}}{m(h)} = const
@@ -299,7 +440,8 @@ Dodatkowo w metodzie SPH wykorzystujemy pochodne funkcj wygładzających $\frac 
 
 \section{Metody odnajdywania cząstek}
 \subsection{Odnajdywanie siłowe}
-Najprostszym sposobem odnajdywania cząstek sąsiadujących jest użycie metody siłowej (eng. brute-force). Metoda polega na przeszukaniu zbioru cząstek i sprawdzenia odległości od cząstki aktualnie analizowanej.\newline
+Najprostszym sposobem odnajdywania cząstek sąsiadujących jest użycie metody siłowej (eng. brute-force). 
+Metoda polega na przeszukaniu zbioru cząstek i sprawdzenia odległości od cząstki aktualnie analizowanej.\newline
 Oznacza to że dla każdej możliwej pary cząstek konieczne jest wykonanie prównania odległości z maksymalną odległością interakcji:\newline
 $$
 ||r_i-r_j|| \leq h.
@@ -336,7 +478,11 @@ W zastosowaniach praktycznych metody SPH, gdzie liczba cząstek sięga tysiący,
 
 \subsection{Siatka jednorodna}
 Jednym z rozwiązań mających na celu przyśpieszenie procesu wyszukiwania cząstek sąsiadujących jest zastosowanie siatki jednorodnej (eng. uniform grid).\newline
-Metoda ta polega na podziale przestrzeni na regularne komórki o stałym rozmiarze. Rozmiar komórki dostosowywany jest do odległości interakcji h. Uzależnienie to pozwala ustalić stałą, ograniczoną liczbę komórek które należy przeszukać.\newline
+Metoda ta polega na podziale przestrzeni na regularne komórki o stałym rozmiarze. 
+Rozmiar komórki dostosowywany jest do odległości interakcji h. 
+Uzależnienie to pozwala ustalić stałą, ograniczoną liczbę komórek które należy przeszukać.\newline
+
+
 Każdej cząstce przypisywana jest komórka siatki na podstawie jej pozycji:\newline
 $$
 i_n = \frac {x_n} r
@@ -366,6 +512,40 @@ Zastosowanie siatki pozwala uzależnić złożoność obliczeniową algorytmu od
 \end{algorithm}
 
 \subsection{Haszowanie przestrzenne}
+Haszowanie przestrzenne (ang. spatial hashing) to technika optymalizacji wyszukiwania cząstek sąsiadujących, która stanowi rozwinięcie podejścia opartego na siatce jednorodnej.
+Metoda ta pozwala na odwzorowanie komórek siatki na strukturę o stałym lub ograniczonym rozmiarze, co skutkuje redukcją zużytej pamięci oraz poprawą skalowalności algorytmu.\newline
+Podobnie do przypadku siatki jednorodnej, przestrzeń symulacji dzielona jest na komórki o stałym rozmiarze uzależnionym od odległości interakcji. 
+Każdej cząstce przypisywany jest indeks komórki na podstawie jej położenia. 
+Jednak zamiast przechowywania pełnowymiarowej tablicy komórek, indeks komórki jest przekształcany za pomocą funkcji haszującej do jednowymiarowego klucza, 
+który służy identyfikacji miejsca przechowywania cząstki w tablicy haszującej.\newline
+Standardowa funkcja mieszająca posiada następującą postać:\newline
+$$
+h(x_0,x_1,...,x_i) = (x_0*p_0\oplus x_1*p_1 \oplus ... \oplus x_i*p_i) mod \space M,
+$$
+Gdzie:\newline
+$x_n$ - współrzędna komórki w wymiarze $n$,\newline
+$p_n$ - stały współczynnik dla wymiaru $n$,\newline
+$M$ - rozmiar tablicy mieszającej.\newline
+Metoda ta jest szczególnie korzystna w przypadku dużych, dynamicznych scen, w których obszar symulacji jest rozległy, a cząstki zajmują jedynie jego część. 
+Dzięki temu unika się alokowania pamięci dla pustych komórek, co stanowi istotną przewagę nad klasyczną siatką jednorodną.\newline
+Do głównych zalet haszowania przestrzennego należą oszczędność pamięci, wysoka wydajność oraz dobra adaptowalność do implementacji równoległych, w tym na procesorach graficznych. 
+Wśród wad można wymienić konieczność obsługi kolizji w tablicy haszującej oraz większą złożoność implementacyjną w porównaniu do klasycznej siatki jednorodnej.\newline
+Możliwą do zastosowania optymalizacją jest wykorzystanie tablicy skrótów. 
+Metoda ta polega na pierwotnym przypisaniu każdej cząsteczce wartości odpowiadającej kluczowi komórki w której się znajduje. 
+Następnym krokiem jest posortowanie cząstek według tych właśnie kluczy. Tablica posortowanych cząstek umożliwia na utworzenie tablicy szybkiego dostępu.\newline
+Tablica ta jest rozmiaru maksymalnego klucza. Każda komórka tablicy zawiera indeks pierwszej cząstki w tablicy posortowanych cząstek, 
+której przypisany klucz odpowiada indeksowi danej komórki.\newline
+
+[rysunek tablicy]\newline
+
+Zakładając stałą ilość komórek symulacji i wielkość tablicy mieszającej można wyprowadzić zależność:\newline
+$$
+P_{dup} = 1-(1-\frac 1 M)^{N-1} 
+$$
+Gdzie:\newline
+$P_{dup}$ - prawdopodobieństwo duplikatu klucza dla pojedynczej komórki,\newline
+$N$ - liczba komórek siatki.\newline
+
 \subsection{Stały indeks}
 \subsection{Metody drzewiaste}
 
