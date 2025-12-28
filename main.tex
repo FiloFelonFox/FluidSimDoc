@@ -15,6 +15,7 @@
 
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{pgfplots}
 
 \title{Praca inżynierska}
 \author{ehhhhhhhhh}
@@ -405,6 +406,14 @@ co powoduje przybliżenie zachowania symulacji do płynów niesprężystych.\new
 
 [tu wstaw kod bliskiej gęstości]\newline
 
+\subsubsection{Przewidywanie pozycji}
+Techniką stabilizacji symulacji jest przewidywanie pozycji cząstek w następnym kroku na podstawie ich aktualnego położenia i prędkości.\newline
+Oznacza to że w każdym kroku do obliczeń zmiany prędkości cząstki wykorzystujemy nie pozycję aktualną cząstki lecz pozycję przewidzianą.\newline
+Oznacza to że podstawowe równanie metody sph zostaje zmodyfikowane do następującej postaci:\newline
+$$
+A(r) \approx \sum_{j}A_j \frac{m_j}{\rho_j}W(r-r_j,h),
+$$
+
 \subsubsection{Funkcje wygładzania}
 Metoda wygładzonych cząstek opiera się na funkcjach wygładzania. Są to funkcje określające wzajemny wpływ cząstek w zależności od odległości.\newline
 Funkcje wygładzania można traktować jako funkcje jednej zmiennej 
@@ -547,11 +556,475 @@ $P_{dup}$ - prawdopodobieństwo duplikatu klucza dla pojedynczej komórki,\newli
 $N$ - liczba komórek siatki.\newline
 
 \subsection{Stały indeks}
-\subsection{Metody drzewiaste}
+Pewną metodą optymalizacji jest wykorzystanie indeksów bez kolizji wyliczanych na podstawie pozycji komórki w siatce. Można zaproponować następujący wzór na indeks komórki:\newline
+$$
+h(x_0,x_1,...,x_i) = (x_0 + x_1*m_0 + ... + x_i*m_i*m_{i-1}*...*m_0),
+$$
+Gdzie:\newline
+$m_n$ - maksymalna liczba komórek w osi $n$\newline
 
-\section{Obliczenia wydajności}
+Optymalizacja ta wymaga odgórnej stałej wielkości tablicy mieszającej, równej liczbie komórek siatki przestrzennej.\newline
+Postać oblczenia indeksu w kodzie:\newline
+[algorithm]\newline
+
 \section{Symulacja}
+W ramach pracy udało się zaimplementować symulację z użyciem metody sph.\newline
+Symulacja w środowisku unity pozwala na manipulowanie parametrami poprzez edytor parametrów unity.\newline
+Symulacja w pełni wspiera manipulację parametrami:\newline
+*Liczba cząstek*
+*Grawiracja*
+*Krok czasowy*
+*Siła sprężystości pojemnika*
+*Promień wygładzania*
+*Gęstość docelowa*
+*Mnożnik ciśnienia*
+*Mnożnik bliskiego ciśnienia*
+*Siła lepkości*
+*Granice symulacji*
+[mnóstwo screenów z róznymi parametrami]
+
+Z powodu implementacji symulacji przy użyciu porocesora graficznego, została ona podzielona na etapy zapisane w odpowiednich jądrach.\newline
+1. Jądro odpowiedzialne za siły zewnętrzne.\newline
+\begin{verbatim}
+[numthreads(NumThreads, 1, 1)]
+void CalculateExternalForces(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParticles)
+		return;
+
+	Velocities[id.x] += ExternalForces(Positions[id.x], Velocities[id.x]) * timeStep;
+}
+\end{verbatim}
+Oraz ciało funkcji ExternalForces():\newline
+\begin{verbatim}
+float2 ExternalForces(float2 pos, float2 velocity)
+{
+	return float2(0, gravity);
+}
+\end{verbatim}
+Jądro jest odpowiedzialne za nadanie każdej cząsteczce przyśpieszenie związanego z siłami zewnętrznymi, co w naszym przypadku oznacza tylko siłę grawitacji.\newline
+
+2. Jądro odpowiedzialne za przewidzenie pozycji cząstki
+\begin{verbatim}
+void PredictPositions(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParticles)
+		return;
+
+	const float predictionStep = 1 / 120.0;
+	PredictedPositions[id.x] = Positions[id.x] + Velocities[id.x] * predictionStep;
+}
+\end{verbatim}
+Na podstawie aktualnej pozycji i prędkości obliczana jest pozycja cząstki, która posłyży do obliczeń sił wpływających na tę cząstkę.\newline
+
+3. Jądro gęstości\newline
+\begin{verbatim}
+[numthreads(NumThreads, 1, 1)]
+void CalculateDensities(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParticles)
+		return;
+
+	float2 position = PredictedPositions[id.x];
+	Densities[id.x] = CalculateDensity(position);
+}
+\end{verbatim}
+
+Ciało funkcji CalculateDensity():\newline
+\begin{verbatim}
+float2 CalculateDensity(float2 position)
+{
+	float sqrSmoothingRadius = smoothingRadius * smoothingRadius;
+	float density = 0;
+	float nearDensity = 0;
+
+	for (int secondParticleIndex = 0; secondParticleIndex < numParticles; secondParticleIndex++)
+	{
+			float2 secondParticlePosition = PredictedPositions[secondParticleIndex];
+			float2 vectorToSecondParticle = secondParticlePosition - position;
+			float sqrDstToSecondParticle = dot(vectorToSecondParticle, vectorToSecondParticle);
+
+			if (sqrDstToSecondParticle > sqrSmoothingRadius)
+				continue;
+
+			float dst = sqrt(sqrDstToSecondParticle);
+			density += DensityKernel(dst, smoothingRadius);
+			nearDensity += NearDensityKernel(dst, smoothingRadius);
+	}
+
+	return float2(density, nearDensity);
+}
+\end{verbatim}
+
+4. Jądro Sił ciśnienia\newline
+\begin{verbatim}
+[numthreads(NumThreads, 1, 1)]
+void CalculatePressureForce(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParticles)
+		return;
+
+	float density = Densities[id.x][0];
+	float densityNear = Densities[id.x][1];
+	float pressure = PressureFromDensity(density);
+	float nearPressure = NearPressureFromDensity(densityNear);
+	float2 pressureForce = 0;
+	
+	float2 position = PredictedPositions[id.x];
+	float sqrSmoothingRadius = smoothingRadius * smoothingRadius;
+
+	for (uint secondParticleIndex = 0; secondParticleIndex < numParticles; secondParticleIndex++)
+	{
+			if (secondParticleIndex == id.x)
+				continue;
+
+			float2 secondParticlePosition = PredictedPositions[secondParticleIndex];
+			float2 vectorToSecondParticle = secondParticlePosition - position;
+			float sqrDstToSecondParticle = dot(vectorToSecondParticle, vectorToSecondParticle);
+
+			if (sqrDstToSecondParticle > sqrSmoothingRadius)
+				continue;
+
+			float distanceToSecondParticle = sqrt(sqrDstToSecondParticle);
+			float2 interractionDirection = distanceToSecondParticle > 0 ? vectorToSecondParticle / distanceToSecondParticle : float2(0, 1);
+
+			float secondParticlePressure = PressureFromDensity(Densities[secondParticleIndex][0]);
+			float secondParticleNearPressure = NearPressureFromDensity(Densities[secondParticleIndex][1]);
+
+			float sharedPressure = (pressure + secondParticlePressure) * 0.5;
+			float sharedNearPressure = (nearPressure + secondParticleNearPressure) * 0.5;
+
+			pressureForce += interractionDirection * DensityDerivative(distanceToSecondParticle, smoothingRadius) * sharedPressure / Densities[secondParticleIndex][0];
+			pressureForce += interractionDirection * NearDensityDerivative(distanceToSecondParticle, smoothingRadius) * sharedNearPressure / Densities[secondParticleIndex][1];
+	}
+	float2 acceleration = pressureForce / density;
+	Velocities[id.x] += acceleration * timeStep;
+}
+\end{verbatim}
+
+5. Jądro siły lepkości
+\begin{verbatim}
+[numthreads(NumThreads, 1, 1)]
+void CalculateViscosity(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParticles)
+		return;
+	
+	float2 position = PredictedPositions[id.x];
+	float sqrSmoothingRadius = smoothingRadius * smoothingRadius;
+
+	float2 viscosityForce = 0;
+	float2 velocity = Velocities[id.x];
+
+	for (uint secondParticleIndex = 0; secondParticleIndex < numParticles; secondParticleIndex++)
+	{
+			if (secondParticleIndex == id.x)
+				continue;
+
+			float2 secondParticlePosition = PredictedPositions[secondParticleIndex];
+			float2 vectorToSecondParticle = secondParticlePosition - position;
+			float sqrDstToSecondParticle = dot(vectorToSecondParticle, vectorToSecondParticle);
+
+			if (sqrDstToSecondParticle > sqrSmoothingRadius)
+				continue;
+
+			float distanceToSecondParticle = sqrt(sqrDstToSecondParticle);
+			float2 secondParticleVelocity = Velocities[secondParticleIndex];
+			viscosityForce += (secondParticleVelocity - velocity) * ViscosityKernel(distanceToSecondParticle, smoothingRadius);
+	}
+	Velocities[id.x] += viscosityForce * viscosityStrength * timeStep;
+}
+\end{verbatim}
+6. Jądro aktualizacji pozycji
+\begin{verbatim}
+[numthreads(NumThreads, 1, 1)]
+void UpdatePositions(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParticles)
+		return;
+
+	Positions[id.x] += Velocities[id.x] * timeStep;
+	HandleCollisions(id.x);
+}
+\end{verbatim}
+
+
+\subsection{Funkcje wygładzające}
+W wyniku badań empirycznych w implementacji symulacji został zastosowany szereg wybranych funkcji wygładzających.\newline
+\subsubsection{Funkcja wielomianowa szóstego stopnia}
+$$
+W(r,h) = m(h)
+\begin{cases}
+(h^2-r^2)^3, & dla \space 0 \leq r \leq h\\
+0, & dla \space r > h
+\end{cases}
+$$
+
+\begin{tikzpicture}% y=x^2
+[baseline=(current bounding box.north)]
+\begin{axis}[
+    axis equal,
+    width=2in,
+    height=2in,
+    axis lines=middle,
+    axis line style={very thick},
+    grid style={thin,densely dotted,black!50},
+    grid=major,
+    xticklabels={},
+    yticklabels={},
+    xtick distance=1, ytick distance=1,
+    extra x ticks=2, extra y ticks=4,
+    xmin=-1, xmax=1,
+    ymin=-0.2, ymax=1.5,
+    xlabel=$x$,
+    ylabel=$y$]
+    \addplot[
+    <->,
+    domain=-2:2,
+    samples=500]
+        (x,{(1-x^2)^3});
+\end{axis}
+\end{tikzpicture}
+\newline
+Gdzie $m(h)$ wynikające z normalizacji:
+
+$$
+m(h) = \frac{35}{16\pi h^8}
+$$
+\newline
+Co w postaci algorytmicznej wygląda następująco:\newline
+
+\begin{verbatim}
+float Poly6Kernel(float distance, float radius)
+{
+	if (distance >= radius)
+		return 0;
+	float v = radius * radius - distance * distance;
+	return v * v * v * Poly6ScalingFactor;
+}
+\end{verbatim}
+
+Funkcja wielomianowa służy do obliczeń dotyczących lepkości. Ponieważ nie wykorzystujemy gradientu lepkości, możemy pozwolić na wykorzystanie funkcji o niskim gradiencie w okolicach wartości $x=0$. Zapewnia to bardziej łagodną granicę wygładzania ruchu cząstek.\newline
+
+\subsubsection{Funkcja "ostra" drugiego stopnia}
+$$
+W(r,h) = m(h)
+\begin{cases}
+(h-r)^2, & dla \space 0 \leq r \leq h\\
+0, & dla \space r > h
+\end{cases}
+$$
+
+\begin{tikzpicture}% y=x^2
+[baseline=(current bounding box.north)]
+\begin{axis}[
+    axis equal,
+    width=2in,
+    height=2in,
+    axis lines=middle,
+    axis line style={very thick},
+    grid style={thin,densely dotted,black!50},
+    grid=major,
+    xticklabels={},
+    yticklabels={},
+    xtick distance=1, ytick distance=1,
+    extra x ticks=2, extra y ticks=4,
+    xmin=-1, xmax=1,
+    ymin=-0.2, ymax=1.5,
+    xlabel=$x$,
+    ylabel=$y$]
+    \addplot[
+    <->,
+    domain=-2:2,
+    samples=500]
+        (x,{(1-abs(x))^2});
+\end{axis}
+\end{tikzpicture}
+\newline
+Gdzie $m(h)$ wynikające z normalizacji:
+
+$$
+m(h) = \frac{3}{\pi h^4}
+$$
+\newline
+Co w postaci algorytmicznej wygląda następująco:\newline
+
+\begin{verbatim}
+float Pow2Kernel(float distance, float radius)
+{
+	if (distance >= radius)
+        return 0;
+	float v = radius - distance;
+	return v * v * SpikyPow2ScalingFactor;
+}
+\end{verbatim}
+Funkcja została wykorzystana w obliczeniach gęstości przez wzgląd na wysoki gradient w okolicach początku układu współrzędnych.\newline
+
+\subsubsection{Gradient funkcji drugiego stopnia}
+$$
+W(r,h) = m(h)
+\begin{cases}
+(r-h), & dla \space 0 \leq r \leq h\\
+0, & dla \space r > h
+\end{cases}
+$$
+
+\begin{tikzpicture}% y=x^2
+[baseline=(current bounding box.north)]
+\begin{axis}[
+    axis equal,
+    width=2in,
+    height=2in,
+    axis lines=middle,
+    axis line style={very thick},
+    grid style={thin,densely dotted,black!50},
+    grid=major,
+    xticklabels={},
+    yticklabels={},
+    xtick distance=1, ytick distance=1,
+    extra x ticks=2, extra y ticks=4,
+    xmin=-1, xmax=1,
+    ymin=-1.5, ymax=0.2,
+    xlabel=$x$,
+    ylabel=$y$]
+    \addplot[
+    <->,
+    domain=-2:2,
+    samples=500]
+        (x,{(abs(x)-1)});
+\end{axis}
+\end{tikzpicture}
+\newline
+Gdzie $m(h)$ wynikające z normalizacji:
+
+$$
+m(h) = \frac{-2}{\pi h^3}
+$$
+\newline
+Co w postaci algorytmicznej wygląda następująco:\newline
+
+\begin{verbatim}
+float Pow2KernelGradient(float distance, float radius)
+{
+	if (distance > radius)
+        return 0;
+	float v = radius - distance;
+	return -v * SpikyPow2DerivativeScalingFactor;
+}
+\end{verbatim}
+Funkcja ta służy do obliczeń z wykorzystaniem gradientu gęstości.\newline
+
+\subsubsection{Funkcja "ostra" trzeciego stopnia}
+$$
+W(r,h) = m(h)
+\begin{cases}
+(h-r)^3, & dla \space 0 \leq r \leq h\\
+0, & dla \space r > h
+\end{cases}
+$$
+
+\begin{tikzpicture}% y=x^2
+[baseline=(current bounding box.north)]
+\begin{axis}[
+    axis equal,
+    width=2in,
+    height=2in,
+    axis lines=middle,
+    axis line style={very thick},
+    grid style={thin,densely dotted,black!50},
+    grid=major,
+    xticklabels={},
+    yticklabels={},
+    xtick distance=1, ytick distance=1,
+    extra x ticks=2, extra y ticks=4,
+    xmin=-1, xmax=1,
+    ymin=-0.2, ymax=1.5,
+    xlabel=$x$,
+    ylabel=$y$]
+    \addplot[
+    <->,
+    domain=-2:2,
+    samples=500]
+        (x,{(1-abs(x))^3});
+\end{axis}
+\end{tikzpicture}
+\newline
+Gdzie $m(h)$ wynikające z normalizacji:
+
+$$
+m(h) = \frac{4}{\pi h^5}
+$$
+\newline
+Co w postaci algorytmicznej wygląda następująco:\newline
+
+\begin{verbatim}
+float Pow3Kernel(float distance, float radius)
+{
+	if (distance >= radius)
+        return 0;
+	float v = radius - distance;
+	return v * v * v * SpikyPow3ScalingFactor;
+}
+\end{verbatim}
+Funkcja trzeciego stopnia przez zwiększony gradient w okolicach zera służy do symulacji bliskiej gęstości, która zakłada większą siłę w okolicach cząstki.\newline
+
+\subsubsection{Gradient funkcji trzeciego stopnia}
+$$
+W(r,h) = m(h)
+\begin{cases}
+-(h-r)^2, & dla \space 0 \leq r \leq h\\
+0, & dla \space r > h
+\end{cases}
+$$
+
+\begin{tikzpicture}
+[baseline=(current bounding box.north)]
+\begin{axis}[
+    axis equal,
+    width=4in,
+    height=4in,
+    axis lines=middle,
+    axis line style={very thick},
+    grid style={thin,densely dotted,black!50},
+    grid=major,
+    xticklabels={},
+    yticklabels={},
+    xtick distance=1, ytick distance=1,
+    extra x ticks=2, extra y ticks=4,
+    xmin=-1, xmax=1,
+    ymin=-1.2, ymax=0.2,
+    xlabel=$x$,
+    ylabel=$y$]
+    \addplot[
+    <->,
+    domain=-2:2,
+    samples=500]
+        (x,{-(1-abs(x))^2});
+\end{axis}
+\end{tikzpicture}
+\newline
+Gdzie $m(h)$ wynikające z normalizacji:
+
+$$
+m(h) = \frac{3}{\pi h^4}
+$$
+\newline
+Co w postaci algorytmicznej wygląda następująco:\newline
+
+\begin{verbatim}
+float Pow3KernelGradient(float distance, float radius)
+{
+	if (distance > radius)
+        return 0;
+	float v = radius - distance;
+	return -v * v * SpikyPow3DerivativeScalingFactor;
+}
+\end{verbatim}
+Funkcja ta służy do obliczeń związanych z gradientem bliskiej gęstości.\newline
+
+
 \section{Wyniki badań}
+Badania zostały przeprowadzone przy użyciu unity profiler.
 \section{Podsumowanie}
 \section{Wnioski}
 \section{Bibliografia}
