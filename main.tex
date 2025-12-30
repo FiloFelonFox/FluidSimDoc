@@ -36,6 +36,7 @@ Wzrost dokładności modeli fizycznych oraz zapotrzebowań na rozdzielczość i 
 Złożoność obliczeniowa problemu symulacji powoduje że istotnym ograniczeniem może być czas jej wykonania. Konsekwentnie wysokiego znaczenia nabierają metody optymalizacji, 
 których celem jest ograniczenie wykorzystywanej pamięci oraz czasu koniecznego do przeprowadzenia obliczeń.\newline
 
+\newpage
 \section{Cel i zakres}
 Celem niniejszej pracy inżynierskiej jest zaproponowanie i analiza rozwiązań dotyczących optymalizacji symulacji płynów. 
 Praca koncentruje się na rozwiązaniach dotyczących metod wyszukiwania cząstek sąsiadujących w metodzie cząstek wygładzonych (SPH) opartej o równania Naviera-Stokesa.\newline\newline
@@ -44,6 +45,7 @@ Zakres pracy obejmuje omówienie podstaw teoretycznych dotyczących symulacji p�
 oraz przedstawienie wyników zastosowania tychże metod w praktyce. Uzyskane rezultaty mogą stanowić podstawę do dalszych badań na temat optymalizacji 
 oraz praktycznego wykorzystania wypracowanych rozwiązań.\newline
 
+\newpage
 \section{Wstęp teoretyczny}
 \subsection{Równania Naviera-Stokesa}
 Równania Naviera–Stokesa stanowią podstawowy zestaw równań opisujących ruch płynów, zarówno cieczy, jak i gazów. 
@@ -567,7 +569,7 @@ Optymalizacja ta wymaga odgórnej stałej wielkości tablicy mieszającej, równ
 Postać oblczenia indeksu w kodzie:\newline
 [algorithm]\newline
 
-\section{Symulacja}
+\section{Implementacja symulacji}
 W ramach pracy udało się zaimplementować symulację z użyciem metody sph.\newline
 Symulacja w środowisku unity pozwala na manipulowanie parametrami poprzez edytor parametrów unity.\newline
 Symulacja w pełni wspiera manipulację parametrami:\newline
@@ -583,8 +585,8 @@ Symulacja w pełni wspiera manipulację parametrami:\newline
 *Granice symulacji*
 [mnóstwo screenów z róznymi parametrami]
 
-Z powodu implementacji symulacji przy użyciu porocesora graficznego, została ona podzielona na etapy zapisane w odpowiednich jądrach.\newline
-1. Jądro odpowiedzialne za siły zewnętrzne.\newline
+Z powodu implementacji symulacji przy użyciu porocesora graficznego, została ona podzielona na etapy zapisane w odpowiednich jądrach.\newline\
+\subsection{Jądro sił zewnętrznych}
 \begin{verbatim}
 [numthreads(NumThreads, 1, 1)]
 void CalculateExternalForces(uint3 id : SV_DispatchThreadID)
@@ -595,7 +597,7 @@ void CalculateExternalForces(uint3 id : SV_DispatchThreadID)
 	Velocities[id.x] += ExternalForces(Positions[id.x], Velocities[id.x]) * timeStep;
 }
 \end{verbatim}
-Oraz ciało funkcji ExternalForces():\newline
+Ciało funkcji ExternalForces():\newline
 \begin{verbatim}
 float2 ExternalForces(float2 pos, float2 velocity)
 {
@@ -604,7 +606,7 @@ float2 ExternalForces(float2 pos, float2 velocity)
 \end{verbatim}
 Jądro jest odpowiedzialne za nadanie każdej cząsteczce przyśpieszenie związanego z siłami zewnętrznymi, co w naszym przypadku oznacza tylko siłę grawitacji.\newline
 
-2. Jądro odpowiedzialne za przewidzenie pozycji cząstki
+\subsection{Jądro przewidywania pozycji cząstki}
 \begin{verbatim}
 void PredictPositions(uint3 id : SV_DispatchThreadID)
 {
@@ -617,7 +619,7 @@ void PredictPositions(uint3 id : SV_DispatchThreadID)
 \end{verbatim}
 Na podstawie aktualnej pozycji i prędkości obliczana jest pozycja cząstki, która posłyży do obliczeń sił wpływających na tę cząstkę.\newline
 
-3. Jądro gęstości\newline
+\subsection{Jądro gęstości}
 \begin{verbatim}
 [numthreads(NumThreads, 1, 1)]
 void CalculateDensities(uint3 id : SV_DispatchThreadID)
@@ -656,7 +658,7 @@ float2 CalculateDensity(float2 position)
 }
 \end{verbatim}
 
-4. Jądro Sił ciśnienia\newline
+\subsection{Jądro sił ciśnienia}
 \begin{verbatim}
 [numthreads(NumThreads, 1, 1)]
 void CalculatePressureForce(uint3 id : SV_DispatchThreadID)
@@ -702,7 +704,7 @@ void CalculatePressureForce(uint3 id : SV_DispatchThreadID)
 }
 \end{verbatim}
 
-5. Jądro siły lepkości
+\subsection{Jądro sił lepkości}
 \begin{verbatim}
 [numthreads(NumThreads, 1, 1)]
 void CalculateViscosity(uint3 id : SV_DispatchThreadID)
@@ -735,7 +737,7 @@ void CalculateViscosity(uint3 id : SV_DispatchThreadID)
 	Velocities[id.x] += viscosityForce * viscosityStrength * timeStep;
 }
 \end{verbatim}
-6. Jądro aktualizacji pozycji
+\subsection{Jądro aktualizacji pozycji}
 \begin{verbatim}
 [numthreads(NumThreads, 1, 1)]
 void UpdatePositions(uint3 id : SV_DispatchThreadID)
@@ -760,12 +762,13 @@ W(r,h) = m(h)
 \end{cases}
 $$
 
+\begin{center}
 \begin{tikzpicture}% y=x^2
 [baseline=(current bounding box.north)]
 \begin{axis}[
     axis equal,
-    width=2in,
-    height=2in,
+    width=4in,
+    height=4in,
     axis lines=middle,
     axis line style={very thick},
     grid style={thin,densely dotted,black!50},
@@ -785,6 +788,7 @@ $$
         (x,{(1-x^2)^3});
 \end{axis}
 \end{tikzpicture}
+\end{center}
 \newline
 Gdzie $m(h)$ wynikające z normalizacji:
 
@@ -815,12 +819,13 @@ W(r,h) = m(h)
 \end{cases}
 $$
 
+\begin{center}
 \begin{tikzpicture}% y=x^2
 [baseline=(current bounding box.north)]
 \begin{axis}[
     axis equal,
-    width=2in,
-    height=2in,
+    width=4in,
+    height=4in,
     axis lines=middle,
     axis line style={very thick},
     grid style={thin,densely dotted,black!50},
@@ -840,6 +845,7 @@ $$
         (x,{(1-abs(x))^2});
 \end{axis}
 \end{tikzpicture}
+\end{center}
 \newline
 Gdzie $m(h)$ wynikające z normalizacji:
 
@@ -869,12 +875,14 @@ W(r,h) = m(h)
 \end{cases}
 $$
 
+
+\begin{center}
 \begin{tikzpicture}% y=x^2
 [baseline=(current bounding box.north)]
 \begin{axis}[
     axis equal,
-    width=2in,
-    height=2in,
+    width=4in,
+    height=4in,
     axis lines=middle,
     axis line style={very thick},
     grid style={thin,densely dotted,black!50},
@@ -894,6 +902,7 @@ $$
         (x,{(abs(x)-1)});
 \end{axis}
 \end{tikzpicture}
+\end{center}
 \newline
 Gdzie $m(h)$ wynikające z normalizacji:
 
@@ -923,12 +932,13 @@ W(r,h) = m(h)
 \end{cases}
 $$
 
+\begin{center}
 \begin{tikzpicture}% y=x^2
 [baseline=(current bounding box.north)]
 \begin{axis}[
     axis equal,
-    width=2in,
-    height=2in,
+    width=4in,
+    height=4in,
     axis lines=middle,
     axis line style={very thick},
     grid style={thin,densely dotted,black!50},
@@ -948,6 +958,7 @@ $$
         (x,{(1-abs(x))^3});
 \end{axis}
 \end{tikzpicture}
+\end{center}
 \newline
 Gdzie $m(h)$ wynikające z normalizacji:
 
@@ -977,6 +988,7 @@ W(r,h) = m(h)
 \end{cases}
 $$
 
+\begin{center}
 \begin{tikzpicture}
 [baseline=(current bounding box.north)]
 \begin{axis}[
@@ -1002,6 +1014,8 @@ $$
         (x,{-(1-abs(x))^2});
 \end{axis}
 \end{tikzpicture}
+\end{center}
+
 \newline
 Gdzie $m(h)$ wynikające z normalizacji:
 
@@ -1022,9 +1036,171 @@ float Pow3KernelGradient(float distance, float radius)
 \end{verbatim}
 Funkcja ta służy do obliczeń związanych z gradientem bliskiej gęstości.\newline
 
+\subsection{Tablice mieszające}
+Zastosowanie tablic mieszających wymaga pewnej modyfikacji kodu zarówno w jądrach jak i po stronie C#.\newline
+Pierwszą zmianą jest konieczność dodatkowego obliczania skrótu komórki w której znajduje się cząsteczka wewnątrz jądra przewidywania pozycji.\newline
 
-\section{Wyniki badań}
-Badania zostały przeprowadzone przy użyciu unity profiler.
+\begin{verbatim}
+[numthreads(NumThreads, 1, 1)]
+void PredictPositions(uint3 id : SV_DispatchThreadID)
+{
+	...
+	
+	int2 cellIndex = int2(floor(PredictedPositions[id.x] / smoothingRadius));
+	ParticleHashTable[id.x] = GetHash(cellIndex);
+	
+}
+\end{verbatim}
+
+Skrót jest obliczany zgodnie z funkcją:\newline
+\begin{verbatim}
+float GetHash(int2 cellIndex)
+{
+	return ((cellIndex.x * 73856093) ^ (cellIndex.y * 19349663)) % hashTableSize;
+}
+\end{verbatim}
+
+Kolejnym krokiem jest posortowanie cząstek wdług skrótu.\newline
+
+Jądro sortowania cząsteczek wygląda następująco:\newline
+\begin{verbatim}
+    [numthreads(NumThreads, 1, 1)]
+void SortParticlesByHash(uint3 id : SV_DispatchThreadID)
+{
+	uint partnerId = id.x ^ sortingDistance;
+	bool ascending = ((id.x & sortingGroupSize) == 0);
+	bool doSwap = (ascending && (ParticleHashTable[id.x] > ParticleHashTable[partnerId])) || (!ascending && (ParticleHashTable[id.x]  < ParticleHashTable[partnerId]));
+	if (doSwap && partnerId > id.x && partnerId < numParticles)
+	{
+		uint tempUint = ParticleHashTable[id.x];
+		ParticleHashTable[id.x] = ParticleHashTable[partnerId];
+        ParticleHashTable[partnerId] = tempUint;
+		
+        float2 tempFloat2 = Positions[id.x];
+        Positions[id.x] = Positions[partnerId];
+		Positions[partnerId] = tempFloat2;
+		
+		tempFloat2 = PredictedPositions[id.x];
+        PredictedPositions[id.x] = PredictedPositions[partnerId];
+        PredictedPositions[partnerId] = tempFloat2;
+		
+		tempFloat2 = Velocities[id.x];
+		Velocities[id.x] = Velocities[partnerId];
+        Velocities[partnerId] = tempFloat2;
+    }
+}
+\end{verbatim}
+
+Oraz część kodu po stronie C# odpowiedzialna za odpowiednie wywołania na procesorze graficznym:\newline
+\begin{verbatim}
+for (int sortingGroupSize = 2; sortingGroupSize <= particleCount; sortingGroupSize *= 2)
+{
+    for (int sortingDistance = sortingGroupSize / 2; sortingDistance > 0; sortingDistance /= 2)
+    {
+        compute.SetInt("sortingGroupSize", sortingGroupSize);
+        compute.SetInt("sortingDistance", sortingDistance);
+        Dispatch(compute, particleCount, kernelIndex: sortParticlesByHashKernel);
+    }
+}
+\end{verbatim}
+
+Kolejnym krokiem jest zbudowanie tablicy szybkiego dostępu:\newline
+\begin{verbatim}
+[numthreads(NumThreads,1,1)]
+void BuildHashOffsetTable(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= hashTableSize)
+		return;
+	for(uint i = 0; i < numParticles; i++)
+	{
+		if (ParticleHashTable[i] == id.x)
+		{
+			HashOffsetTable[id.x] = i;
+			return;
+		}
+	}
+    HashOffsetTable[id.x] = numParticles;
+}
+\end{verbatim}
+
+Wykorzystanie powstałej struktury również wymaga odpowiedniej modyfikacji w jądrach wymagających dostępu do cząstek sąsiednich.\newline
+\begin{verbatim}
+[numthreads(NumThreads, 1, 1)]
+void CalculateDensities(uint3 id : SV_DispatchThreadID)
+{
+	[...]
+    
+    int2 cellIndex = int2(floor(position / smoothingRadius));
+    uint neighborHashes[9];
+    GetNeighbouringCellHashes(cellIndex, neighborHashes);
+	
+    for (int i = 0; i < 9; i++)
+    {
+        uint currentHash = neighborHashes[i];
+        if (currentHash == MAX_UINT)
+            break;
+        for (uint startIndex = HashOffsetTable[currentHash]; startIndex < numParticles && ParticleHashTable[startIndex] == currentHash; startIndex++)
+        {
+            [...]
+        }
+    }
+    [...]
+}
+\end{verbatim}
+
+Przez możliwość kolizji niemożliwe jest bezpośrednie sprawdzanie cząstek na podstawie otrzymanych skórtów. Wymagane jest wcześniejsze wyeliminowanie elementów powtarzających się, czym zajmuje się funkcja GetNeighbouringCellHashes(cellIndex, neighborHashes);\newline
+\begin{verbatim}
+void GetNeighbouringCellHashes(int2 cellIndex, out uint results[9])
+{
+	uint offsets[] = {
+		-1, -1,
+		-1, 0,
+		-1, 1,
+		 0, -1,
+		 0, 0,
+		 0, 1,
+		 1, -1,
+		 1, 0,
+		 1, 1
+	};
+	
+    uint idx = 0;
+    for (int i = 0; i < 9; i++)
+    {	
+        results[idx] = MAX_UINT;
+        uint hash = GetHash(cellIndex + int2(offsets[i * 2], offsets[i * 2 + 1]));
+        bool found = false;
+        for (int j = 0; j < i; j++)
+        {
+			if (results[j] == hash)
+			{
+				found = true;
+				break;
+            }
+        }
+        if (!found)
+        {
+            results[idx] = hash;
+            idx++;
+        }
+    }
+}
+\end{verbatim}
+
+\section{Badania}
+\subsection{Unity Profiler}
+Badania zostały przeprowadzone w środowisku Unity przy użyciu Unity Profiler.\newline
+Unity Profiler pozwala na zbieranie i wizualizację danych odnośnie zużycia czasu procesora i pamięci przez poszczególne fragmenty programu.\newline
+Narzędzie pozwala na inspekcję pojedynczych klatek pod względem wydajności celem optymalizacji pracy aplikacji.\newline
+Narzędzie pozwala na wizualizację zasobu z podziałem na rodzaje zużycia tego zasobu.\newline
+\begin{center}
+    \includegraphics[width=7in]{profiler_wykres.png}
+\end{center}
+Unity Profiler zapewnia także widok hierarchiczy z dokładnymi parametrami wybranych części programmu, bądź wezwanych jąder procesora graficznego.\newline
+\begin{center}
+    \includegraphics[width=7in]{profiler_hierarhia.png}
+\end{center}
+
 \section{Podsumowanie}
 \section{Wnioski}
 \section{Bibliografia}
