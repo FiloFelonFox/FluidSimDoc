@@ -180,7 +180,7 @@ $p$ - ciśnienie,\newline
 $\rho$ - gęstość,\newline
 $\mu$ - współczynnik lepkości,\newline
 $X,Y,Z$ - rzuty wektora sił masowych K na osie współrzędnych,\newline
-(pochodna substancjonalna) - pochodna substancjonalna,\newline
+$\frac{dw}{dt} = \frac{\partial w}{\partial t} + w \space grad \space w$ - pochodna substancjonalna.\newline
 
 Równania są wyprowadzone na podstawie Newtonowskiego uogólnionego prawa tarcia.
 Analiza płynów ściśliwych wymaga dodatkowo zastosowania równań uwzględniających ciśnienie, gęstość, temperaturę i przepływy energii.
@@ -513,8 +513,11 @@ $n_s$ - liczba komórek koniecznych do sprawdzenia,\newline
 $d$ - liczba wymiarów symulacji.\newline
 
 Zastosowanie siatki pozwala uzależnić złożoność obliczeniową algorytmu od liczby cząstek oczekiwanej wewnątrz sąsiadujących komórek siatki, zamiast od całkowitej liczby cząstek.\newline
-
-\includepdf[pages=-]{MetodaSPH.drawio.pdf}
+\begin{center}
+    \includegraphics[width=6.5in]{MetodaSPH.png}
+    \caption{Rysunek 1: Wizualizacja siatki w metodzie SPH}
+    \label{teoria_1}
+\end{center}
 
 \subsection{Haszowanie przestrzenne}
 Haszowanie przestrzenne (ang. spatial hashing) to technika optymalizacji wyszukiwania cząstek sąsiadujących, która stanowi rozwinięcie podejścia opartego na siatce jednorodnej.
@@ -541,7 +544,11 @@ Następnym krokiem jest posortowanie cząstek według tych właśnie kluczy. Tab
 Tablica ta jest rozmiaru maksymalnego klucza. Każda komórka tablicy zawiera indeks pierwszej cząstki w tablicy posortowanych cząstek, 
 której przypisany klucz odpowiada indeksowi danej komórki.\newline
 
-\includepdf[pages=-]{Tablica_skrotow.drawio-1.pdf}
+\begin{center}
+    \includegraphics[width=6.5in]{Tablica.png}
+    \caption{Rysunek 2: Schemat działania tablicy skrótów}
+    \label{teoria_2}
+\end{center}
 
 Zakładając stałą ilość komórek symulacji i wielkość tablicy mieszającej można wyprowadzić zależność:\newline
 $$
@@ -565,13 +572,28 @@ Optymalizacja ta wymaga odgórnej stałej wielkości tablicy mieszającej, równ
 W ramach pracy udało się zaimplementować symulację z użyciem metody sph.\newline
 Symulacja w środowisku unity pozwala na manipulowanie parametrami poprzez edytor parametrów unity.\newline
 
-Działanie symulacji można uznać za satysfakcjonujące.\newline
-[screen wysoka gęstość]\newline
-[niska gestosc]\newline
-[brak grawitacji]\newline
-[wysoka grawitacja]\newline
-[wysoka sila lepkosci]\newline
-[brak lepkosci]\newline
+\begin{center}
+    \includegraphics[width=6.5in]{gravity.png}
+    \caption{Rysunek 3: Działanie symulacji w standardowych warunkach}
+    \label{implementacja_1}
+\end{center}
+\begin{center}
+    \includegraphics[width=6.5in]{no_gravity.png}
+    \caption{Rysunek 4: Działanie symulacji przy zerowej sile grawitacji}
+    \label{implementacja_2}
+\end{center}
+\begin{center}
+    \includegraphics[width=6.5in]{high_density.png}
+    \caption{Rysunek 5: Działanie symulacji po ustawieniu wysokiej gęstości docelowej}
+    \label{implementacja_3}
+\end{center}
+\begin{center}
+    \includegraphics[width=6.5in]{no_viscosity.png}
+    \caption{Rysunek 6: Działanie symulacji przy ustawieniu zerowej siły lepkości}
+    \label{implementacja_4}
+\end{center}
+
+Działanie symulacji można uznać za satysfakcjonujące. Pozwala ona na manipulację parametrami płynu i uzyskanie spodziewanych zmian w jego zachowaniu.\newline
 
 Z powodu implementacji symulacji przy użyciu porocesora graficznego, została ona podzielona na etapy zapisane w odpowiednich jądrach.\newline\
 \subsection{Jądro sił zewnętrznych}
@@ -804,8 +826,12 @@ $$
         (x,{(1-x^2)^3});
 \end{axis}
 \end{tikzpicture}
+\caption{Rysunek 7: Funkcja wielomianowa szóstego stopnia}
+\label{functions_1}
 \end{center}
+
 \newline
+
 Gdzie $m(h)$ wynikające z normalizacji:
 
 $$
@@ -861,8 +887,12 @@ $$
         (x,{(1-abs(x))^2});
 \end{axis}
 \end{tikzpicture}
+\caption{Rysunek 8: Funkcja "ostra" drugiego stopnia}
+\label{functions_2}
 \end{center}
 \newline
+
+
 Gdzie $m(h)$ wynikające z normalizacji:
 
 $$
@@ -918,7 +948,10 @@ $$
         (x,{(abs(x)-1)});
 \end{axis}
 \end{tikzpicture}
+\caption{Rysunek 9: Gradient funkcji drugiego stopnia}
+\label{functions_3}
 \end{center}
+
 \newline
 Gdzie $m(h)$ wynikające z normalizacji:
 
@@ -974,7 +1007,10 @@ $$
         (x,{(1-abs(x))^3});
 \end{axis}
 \end{tikzpicture}
+\caption{Rysunek 10: Funkcja "ostra" trzeciego stopnia}
+\label{functions_4}
 \end{center}
+
 \newline
 Gdzie $m(h)$ wynikające z normalizacji:
 
@@ -1030,7 +1066,10 @@ $$
         (x,{-(1-abs(x))^2});
 \end{axis}
 \end{tikzpicture}
+\caption{Rysunek 11: Gradient funkcji trzeciego stopnia}
+\label{functions_5}
 \end{center}
+
 
 \newline
 Gdzie $m(h)$ wynikające z normalizacji:
@@ -1054,7 +1093,7 @@ float Pow3KernelGradient(float distance, float radius)
 Funkcja ta służy do obliczeń związanych z gradientem bliskiej gęstości.\newline
 
 \subsection{Tablice mieszające}
-Zastosowanie tablic mieszających wymaga pewnej modyfikacji kodu zarówno w jądrach jak i po stronie C#.\newline
+Zastosowanie tablic mieszających wymaga pewnej modyfikacji kodu zarówno w jądrach jak i po stronie C\#.\newline
 Pierwszą zmianą jest konieczność dodatkowego obliczania skrótu komórki w której znajduje się cząsteczka wewnątrz jądra przewidywania pozycji.\newline
 
 \noindent\rule{6in}{0.4pt}
@@ -1115,7 +1154,7 @@ void SortParticlesByHash(uint3 id : SV_DispatchThreadID)
 \end{verbatim}
 \noindent\rule{6in}{0.4pt}
 
-Oraz część kodu po stronie C# odpowiedzialna za odpowiednie wywołania na procesorze graficznym:\newline
+Oraz część kodu po stronie C\# odpowiedzialna za odpowiednie wywołania na procesorze graficznym:\newline
 \noindent\rule{6in}{0.4pt}
 \begin{verbatim}
 for (int sortingGroupSize = 2; sortingGroupSize <= particleCount; sortingGroupSize *= 2)
@@ -1129,6 +1168,16 @@ for (int sortingGroupSize = 2; sortingGroupSize <= particleCount; sortingGroupSi
 }
 \end{verbatim}
 \noindent\rule{6in}{0.4pt}
+
+Kod ten jest implementacją sortowania bitonicznego, które jest metodą sortowania przestosowaną do wysokiego zrównoleglenia. W wyniku jego działania przeprowadzany jest następujący schemat porównań wartości sortowanych:\newline
+
+\begin{center}
+    \includegraphics[width=6.5in]{Bitonic.png}
+    \caption{Rysunek 12: Schemat sortowania bitonicznego}
+    \label{implementation_1}
+\end{center}
+\newline\newline
+
 
 Kolejnym krokiem jest zbudowanie tablicy szybkiego dostępu:\newline
 \noindent\rule{6in}{0.4pt}
@@ -1228,28 +1277,32 @@ Narzędzie pozwala na inspekcję pojedynczych klatek pod względem wydajności c
 Narzędzie pozwala na wizualizację zasobu z podziałem na rodzaje zużycia tego zasobu.\newline
 \begin{center}
     \includegraphics[width=7in]{profiler_wykres.png}
+    \caption{Rysunek 13: Unity profiler - wizualizacja zużycia zasobów w czasie}
+    \label{badania_1}
 \end{center}
 Unity Profiler zapewnia także widok hierarchiczy z dokładnymi parametrami wybranych części programu, bądź wezwanych jąder procesora graficznego.\newline
 \begin{center}
     \includegraphics[width=7in]{profiler_hierarhia.png}
+    \caption{Rysunek 14: Unity profiler - widok hierarchiczny zużycia zasobów}
+    \label{badania_2}
 \end{center}
 
 \subsection{Wyniki}
 \subsubsection{Metoda siłowa}
 \begin{center}
     \includegraphics[width=6.5in]{siła.png}
-    \caption{Rysunek 10: Czas wykonania poszczególnych jąder w metodzie siłowej}
+    \caption{Rysunek 15: Czas wykonania poszczególnych jąder w metodzie siłowej}
     \label{wyniki_1}
 \end{center}
 \begin{center}
     \includegraphics[width=6.5in]{siła_skumulowany.png}
-    \caption{Rysunek 11: Skumulowany czas wykonania jąder w metodzie siłowej}
+    \caption{Rysunek 16: Skumulowany czas wykonania jąder w metodzie siłowej}
     \label{wyniki_2}
 \end{center}
 Dla metody siłowej zauważalna jest kwadratowa zależność czasu obliczeń od liczby cząstek co prowadzi do gwałtownego wzrostu w jądrach wymagających odnalezienia sąsiadujących cząstek.\newline
 \begin{center}
     \includegraphics[width=6.5in]{siła-kompozycja.png}
-    \caption{Rysunek 12: Kompozycja klatki w metodzie siłowej}
+    \caption{Rysunek 17: Kompozycja klatki w metodzie siłowej}
     \label{wyniki_3}
 \end{center}
 W wykresie skumulowanym czasu klatki symulacji widać, że dla wyższych ilości cząstek czasy przewidywania pozycji oraz jej aktualizacji są nieznaczące. Dodatkowo obliczenia sił zewnętrznych są pomijalne również dla niskich wartości.\newline
@@ -1258,42 +1311,49 @@ W wykresie skumulowanym czasu klatki symulacji widać, że dla wyższych ilości
 Przedstawione wyniki dotyczą symulacji z liczbą cząstek równą 8096.\newline
 \begin{center}
     \includegraphics[width=6.5in]{pojedyncze.png}
-    \caption{Rysunek 13: Czas wykonania poszczególnych jąder z użyciem tablic mieszających}
+    \caption{Rysunek 18: Czas wykonania poszczególnych jąder z użyciem tablic mieszających}
     \label{wyniki_4}
 \end{center}
 
 \begin{center}
     \includegraphics[width=6.5in]{skumulowany.png}
-    \caption{Rysunek 14: Skumulowany czas wykonania jąder z użyciem tablic mieszających}
+    \caption{Rysunek 19: Skumulowany czas wykonania jąder z użyciem tablic mieszających}
     \label{wyniki_5}
 \end{center}
 Powyższy wykres pozwala stwierdzić na przyśpieszenie spowodowane odpowiednio dostosowaną wartością wielkości tablicy mieszającej. Tutaj wartość optymalna znajduje się w okolicach trzech tysięcy.\newline
 Co ciekawe dla bardzo niskich wielkości tablicy zauważalny jest początkowy wzrost. Jest to spowodowane faktem, że dla niskich wartości $M$ przypadki powodujące przyśpieszenie obliczeń są rzadkie i w większości sytuacji nadal sprawdzane są wszystkie możliwe cząstki w symulacji.\newline
+Zauważalna jest znaczna poprawa czasowa względem metody siłowej.\newline
 \begin{center}
     \includegraphics[width=6.5in]{kompozycja.png}
-    \caption{Rysunek 15: Kompozycja klatki przy użyciu tablic mieszających}
+    \caption{Rysunek 20: Kompozycja klatki przy użyciu tablic mieszających}
     \label{wyniki_6}
 \end{center}
 Oprócz niskiego wpływu obliczeń dotyczących sił zewnętrznych dodatkowo dla wzrastającej wielkości tablicy zauważalny jest również spodziewany wzrost czasu tworzenia tablicy skrótów.\newline
 \begin{center}
     \includegraphics[width=6.5in]{0.6.png}
-    \caption{Rysunek 16: Czas wykonania poszczególnych jąder z użyciem tablic mieszających z promieniem wygładzania = 0.6}
+    \caption{Rysunek 21: Czas wykonania poszczególnych jąder z użyciem tablic mieszających z promieniem wygładzania = 0.6}
     \label{wyniki_7}
 \end{center}
 \begin{center}
     \includegraphics[width=6.5in]{1.png}
-    \caption{Rysunek 17: Czas wykonania poszczególnych jąder z użyciem tablic mieszających z promieniem wygładzania = 1}
+    \caption{Rysunek 22: Czas wykonania poszczególnych jąder z użyciem tablic mieszających z promieniem wygładzania = 1}
     \label{wyniki_8}
 \end{center}
 \begin{center}
     \includegraphics[width=6.5in]{zestawienie.png}
-    \caption{Rysunek 18: Zestawienie całkowitego czasu symulacji dla różnych promieni wygładzania}
+    \caption{Rysunek 23: Zestawienie całkowitego czasu symulacji dla różnych promieni wygładzania}
     \label{wyniki_9}
 \end{center}
 Przy zmianie promienia wygładzania zauważalny jest wpływ na czas trwania kroku symulacji.\newline
 
 
 \section{Podsumowanie}
+Celem pracy było zaprojektowanie oraz implementacja wydajnej symulacji płynów opartej na metodzie SPH, ze szczególnym uwzględnieniem etapu wyszukiwania cząstek sąsiadujących. Problem ten stanowi kluczowy element wpływający wydajność całego algorytmu.\newline
+W pracy przedstawione zostały podstawy matematyczne metody SPH, obejmujące dyskretyzację równań Naviera-Stokes'a i wykorzystanie funkcji wygładzających. Omówiono sposób obliczania gęstości, sił ciśnienia, lepkości oraz sił zewnętrznych działających na cząstki.\newline\newline
+Implementacja algorytmu została zrealizowana z wykorzystaniem procesora graficznego, co pozwoliło na masowe zrównoleglenie obliczeń. Przedstawiono strukturę jąder obliczeniowych oraz mechanizmy sortowania cząstek według kluczy haszujących. Zwrócono uwagę na znaczenie koalescencji dostępu do pamięci oraz minimalizacji operacji synchronizacyjnych, które mają istotny wpływ na wydajność obliczeń na architekturze GPU.\newline\newline
+Wyniki przeprowadzonych testów wydajnościowych potwierdziły przewagę zaproponowanego podejścia nad metodą siłową. Analiza czasów wykonania wykazała znaczące skrócenie czasu obliczeń dla dużej liczby cząstek, bez zmian w jakości symulacji. Dodatkowo przeanalizowano wpływ rozmiaru komórki siatki oraz parametrów tablicy mieszającej na efektywność wyszukiwania sąsiadów.\newline\newline
+Podsumowując, zastosowanie haszowania przestrzennego w połączeniu z obliczeniami równoległymi na GPU stanowi skuteczne rozwiązanie problemu optymalizacji symulacji SPH. Uzyskane rezultaty potwierdzają zasadność wykorzystania struktur danych opartych na podziale przestrzeni w symulacjach cząsteczkowych. Przedstawione rozwiązanie może stanowić punkt wyjścia do dalszych badań, obejmujących m.in. symulacje trójwymiarowe, adaptacyjne metody doboru promienia wygładzania oraz dodatkowe techniki stabilizacji numerycznej.\newline
+
 \section{Bibliografia}
 
 \end{document}
