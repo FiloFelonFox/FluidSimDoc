@@ -3,6 +3,8 @@
 % Language setting
 % Replace `english' with e.g. `spanish' to change the document language
 \usepackage[polish]{babel}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
 
 % Set page size and margins
 % Replace `letterpaper' with `a4paper' for UK/EU standard size
@@ -22,8 +24,7 @@
 \author{ehhhhhhhhh}
 
 \begin{document}
-\maketitle
-\newpage
+\includepdf{Strona tytułowa.pdf}
 \tableofcontents
 \newpage
 
@@ -209,7 +210,7 @@ $$
 $$
 
 Wykorzystanie metody cząsteczkowej pozwala na pewne uproszczenia, mianowicie:\newline
-(1) Stała liczba cząsteczek zapewnia zachowanie masy wewnątrz systemu\newline
+(1) Stała liczba cząsteczek zapewnia zachowanie masy wewnątrz systemu,\newline
 (2) wyrażenie (wstaw wyrażenie) może zostać zastąpione operatorem Stokesa(wstaw drugie). 
 Ponieważ cząstki poruszają się wraz z płynem operator Stokesa pola prędkości jest pochodną czasu prędkości co znaczy, że wyrażenie $v \nabla v$ nie jest potrzebne.\newline\newline
 Oznacza to że równanie przyjmuje następującą formę:\newline
@@ -228,7 +229,7 @@ Siły powodujące wygładzenie pola prędkości płynu spowodowane jego lepkośc
 Ponieważ zastosowana wersja symulacji nie zakłada sił innych niż siła grawitacji równanie wygląda następująco:\newline
 $$
 \rho \frac{D v}{D t}
-= - \nabla p + \rho g + \mu \nabla^2v,
+= - \nabla p + \rho g + \mu \nabla^2v.
 $$
 
 
@@ -246,7 +247,7 @@ $m$ - masa cząstki,\newline
 $\rho$ - gęstość w punkcie cząstki,\newline
 $W$ - funkcja wygładzająca\newline
 $r_n$ - pozycja cząstki $n$,\newline
-$h$ - odległość oddziaływania,\newline\newline
+$h$ - promień wygładzania.\newline\newline
 Równania opisujące zmiany stanu cząstek, takie jak równania Naviera-Stokesa są w metodzie SPH zapisywane w postaci dyskretnej, 
 w oparciu o tą właśnie metodę obliczania wartości fizycznej w punkcie.\newline
 Do zalet metody SPH należy prostota jej implementacji, łatwość zrównoleglenia oraz możliwość modelowania zjawisk z ruchomymi granicami.\newline
@@ -270,12 +271,12 @@ Ciśnienie $p$ wyznaczane jest równaniem gazu idealnego:\newline
 $$
 p=k\rho
 $$
-gdzie $k$ to stała gazu zależna od temperatury.\newline
+gdzie $k$ to stała gazu zależna od temperatury.\newline\newline
 Desburn sugeruje wykorzystanie zmodyfikowanej wersji równania:\newline
 $$
 p=k(\rho - \rho_0)
 $$
-gdzie $\rho_0$ jest gęstością spoczynku.\newline
+gdzie $\rho_0$ jest gęstością spoczynku.\newline\newline
 Pozwala to na wyznaczenie gęstości do której dążyć będzie symulowany płyn jako łatwo modyfikowalny parametr.\newline
 Ponieważ równania zależą od gradientu ciśnienia, przesunięcie nie wpływa na obliczenia siły.\newline
 
@@ -564,7 +565,7 @@ $$
 h(x_0,x_1,...,x_i) = (x_0 + x_1*m_0 + ... + x_i*m_i*m_{i-1}*...*m_0),
 $$
 Gdzie:\newline
-$m_n$ - maksymalna liczba komórek w osi $n$\newline
+$m_n$ - maksymalna liczba komórek w osi $n$.\newline
 
 Optymalizacja ta wymaga odgórnej stałej wielkości tablicy mieszającej, równej liczbie komórek siatki przestrzennej.\newline
 
@@ -826,6 +827,7 @@ $$
         (x,{(1-x^2)^3});
 \end{axis}
 \end{tikzpicture}
+\newline
 \caption{Rysunek 7: Funkcja wielomianowa szóstego stopnia}
 \label{functions_1}
 \end{center}
@@ -840,6 +842,7 @@ $$
 \newline
 Co w postaci algorytmicznej wygląda następująco:\newline
 
+\noindent\rule{6in}{0.4pt}
 \begin{verbatim}
 float Poly6Kernel(float distance, float radius)
 {
@@ -849,6 +852,7 @@ float Poly6Kernel(float distance, float radius)
 	return v * v * v * Poly6ScalingFactor;
 }
 \end{verbatim}
+\noindent\rule{6in}{0.4pt}
 
 Funkcja wielomianowa służy do obliczeń dotyczących lepkości. Ponieważ nie wykorzystujemy gradientu lepkości, możemy pozwolić na wykorzystanie funkcji o niskim gradiencie w okolicach wartości $x=0$. Zapewnia to bardziej łagodną granicę wygładzania ruchu cząstek.\newline
 
@@ -887,6 +891,7 @@ $$
         (x,{(1-abs(x))^2});
 \end{axis}
 \end{tikzpicture}
+\newline
 \caption{Rysunek 8: Funkcja "ostra" drugiego stopnia}
 \label{functions_2}
 \end{center}
@@ -901,6 +906,7 @@ $$
 \newline
 Co w postaci algorytmicznej wygląda następująco:\newline
 
+\noindent\rule{6in}{0.4pt}
 \begin{verbatim}
 float Pow2Kernel(float distance, float radius)
 {
@@ -910,6 +916,8 @@ float Pow2Kernel(float distance, float radius)
 	return v * v * SpikyPow2ScalingFactor;
 }
 \end{verbatim}
+\noindent\rule{6in}{0.4pt}
+
 Funkcja została wykorzystana w obliczeniach gęstości przez wzgląd na wysoki gradient w okolicach początku układu współrzędnych.\newline
 
 \subsubsection{Gradient funkcji drugiego stopnia}
@@ -948,6 +956,7 @@ $$
         (x,{(abs(x)-1)});
 \end{axis}
 \end{tikzpicture}
+\newline
 \caption{Rysunek 9: Gradient funkcji drugiego stopnia}
 \label{functions_3}
 \end{center}
@@ -961,6 +970,7 @@ $$
 \newline
 Co w postaci algorytmicznej wygląda następująco:\newline
 
+\noindent\rule{6in}{0.4pt}
 \begin{verbatim}
 float Pow2KernelGradient(float distance, float radius)
 {
@@ -970,6 +980,8 @@ float Pow2KernelGradient(float distance, float radius)
 	return -v * SpikyPow2DerivativeScalingFactor;
 }
 \end{verbatim}
+\noindent\rule{6in}{0.4pt}
+
 Funkcja ta służy do obliczeń z wykorzystaniem gradientu gęstości.\newline
 
 \subsubsection{Funkcja "ostra" trzeciego stopnia}
@@ -1007,6 +1019,7 @@ $$
         (x,{(1-abs(x))^3});
 \end{axis}
 \end{tikzpicture}
+\newline
 \caption{Rysunek 10: Funkcja "ostra" trzeciego stopnia}
 \label{functions_4}
 \end{center}
@@ -1020,6 +1033,7 @@ $$
 \newline
 Co w postaci algorytmicznej wygląda następująco:\newline
 
+\noindent\rule{6in}{0.4pt}
 \begin{verbatim}
 float Pow3Kernel(float distance, float radius)
 {
@@ -1029,6 +1043,8 @@ float Pow3Kernel(float distance, float radius)
 	return v * v * v * SpikyPow3ScalingFactor;
 }
 \end{verbatim}
+\noindent\rule{6in}{0.4pt}
+
 Funkcja trzeciego stopnia przez zwiększony gradient w okolicach zera służy do symulacji bliskiej gęstości, która zakłada większą siłę w okolicach cząstki.\newline
 
 \subsubsection{Gradient funkcji trzeciego stopnia}
@@ -1066,6 +1082,7 @@ $$
         (x,{-(1-abs(x))^2});
 \end{axis}
 \end{tikzpicture}
+\newline
 \caption{Rysunek 11: Gradient funkcji trzeciego stopnia}
 \label{functions_5}
 \end{center}
@@ -1090,6 +1107,7 @@ float Pow3KernelGradient(float distance, float radius)
 }
 \end{verbatim}
 \noindent\rule{6in}{0.4pt}
+
 Funkcja ta służy do obliczeń związanych z gradientem bliskiej gęstości.\newline
 
 \subsection{Tablice mieszające}
@@ -1346,14 +1364,45 @@ Oprócz niskiego wpływu obliczeń dotyczących sił zewnętrznych dodatkowo dla
 \end{center}
 Przy zmianie promienia wygładzania zauważalny jest wpływ na czas trwania kroku symulacji.\newline
 
+\subsubsection{Stały indeks}
+ Zastąpienie sposobu wyliczania indeksu w tablicy za pomocą funkcji xor na numerowane komórki pozwala na przyśpieszenie działania symulacji przy zużyciu tej samej ilości pamięci.
+
+ \begin{center}
+    \includegraphics[width=6.5in]{stały.png}
+    \caption{Rysunek 24: Zestawienie całkowitego czasu klatki symulacji w zależności od metody}
+    \label{wyniki_9}
+\end{center}
+
+Dla przestrzeni symulacji $16 x 9$ i promienia wygładzania $h=0.415$ długości tablicy jest równa 858 komórek.\newline
+Jednak wielkość tablicy nie posiada większego znaczenia gdyż nawet dla większych tablic wykorzystanie metody oblczania indeksów nie pozwalającej na powstawanie kolizji okazuje się bardziej korzystwnym rozwiązaniem.
 
 \section{Podsumowanie}
 Celem pracy było zaprojektowanie oraz implementacja wydajnej symulacji płynów opartej na metodzie SPH, ze szczególnym uwzględnieniem etapu wyszukiwania cząstek sąsiadujących. Problem ten stanowi kluczowy element wpływający wydajność całego algorytmu.\newline
-W pracy przedstawione zostały podstawy matematyczne metody SPH, obejmujące dyskretyzację równań Naviera-Stokes'a i wykorzystanie funkcji wygładzających. Omówiono sposób obliczania gęstości, sił ciśnienia, lepkości oraz sił zewnętrznych działających na cząstki.\newline\newline
+W pracy przedstawione zostały podstawy matematyczne metody SPH, obejmujące dyskretyzację równań Naviera-Stokesa i wykorzystanie funkcji wygładzających. Omówiono sposób obliczania gęstości, sił ciśnienia, lepkości oraz sił zewnętrznych działających na cząstki.\newline\newline
 Implementacja algorytmu została zrealizowana z wykorzystaniem procesora graficznego, co pozwoliło na masowe zrównoleglenie obliczeń. Przedstawiono strukturę jąder obliczeniowych oraz mechanizmy sortowania cząstek według kluczy haszujących. Zwrócono uwagę na znaczenie koalescencji dostępu do pamięci oraz minimalizacji operacji synchronizacyjnych, które mają istotny wpływ na wydajność obliczeń na architekturze GPU.\newline\newline
 Wyniki przeprowadzonych testów wydajnościowych potwierdziły przewagę zaproponowanego podejścia nad metodą siłową. Analiza czasów wykonania wykazała znaczące skrócenie czasu obliczeń dla dużej liczby cząstek, bez zmian w jakości symulacji. Dodatkowo przeanalizowano wpływ rozmiaru komórki siatki oraz parametrów tablicy mieszającej na efektywność wyszukiwania sąsiadów.\newline\newline
 Podsumowując, zastosowanie haszowania przestrzennego w połączeniu z obliczeniami równoległymi na GPU stanowi skuteczne rozwiązanie problemu optymalizacji symulacji SPH. Uzyskane rezultaty potwierdzają zasadność wykorzystania struktur danych opartych na podziale przestrzeni w symulacjach cząsteczkowych. Przedstawione rozwiązanie może stanowić punkt wyjścia do dalszych badań, obejmujących m.in. symulacje trójwymiarowe, adaptacyjne metody doboru promienia wygładzania oraz dodatkowe techniki stabilizacji numerycznej.\newline
 
 \section{Bibliografia}
+\begin{thebibliography}{9}
+\bibitem{article1}
+Matthias Müller, David Charypar i Markus Gross (2003) Particle-Based Fluid Simulation for Interactive Applications
 
+\bibitem{article2}
+Simon Clavet, Philippe Beaudoin, i Pierre Poulin (2005) Particle-based Viscoelastic Fluid Simulation
+
+\bibitem{article3}
+Mathieu Desbrun i Marie-Paule Gascuel (1996) Smoothed Particles: A new paradigm for
+animating highly deformable bodies
+
+\bibitem{article4}
+Simon Premože, Tolga Tasdizen, James Bigler, Aaron Lefohn i Ross T. Whitaker (2003) Particle-Based Simulation of Fluids
+
+\bibitem{article5}
+J. P. Morris. (2000) Simulating surface tension with smoothed particle
+hydrodynamics.
+
+\bibitem{book1}
+D. Pnueli and C. Gutfinger. (1992) Fluid Mechanics.
+\end{thebibliography}
 \end{document}
