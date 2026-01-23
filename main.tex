@@ -19,7 +19,6 @@
 \usepackage{algpseudocode}
 \usepackage{pgfplots}
 \usepackage{pdfpages}
-\usepackage{hyperref}
 
 \usepackage{listings}
 \lstset{frame=Trbl,numbers=left,breaklines=true}
@@ -31,7 +30,7 @@
   morecomment=[s]{/*}{*/},
   morestring=[b]',
   morestring=[b]",
-  breakilnes=true
+  breaklines=true
 }
 
 \title{Praca inżynierska}
@@ -65,7 +64,7 @@ oraz praktycznego wykorzystania wypracowanych rozwiązań.\newline
 \newpage
 \section{Wstęp teoretyczny}
 \subsection{Równania Naviera-Stokesa}
-\textbf{Równania Naviera–Stokesa}\cite stanowią podstawowy zestaw równań opisujących ruch płynów, zarówno cieczy, jak i gazów. Pierwotnie zostały one wyprowadzone przez L. Naviera i S. D. Poissona\cite{navier} na podstawie rozważań dotyczących sił międzycząsteczkowych. Z kolei B. Saint-Venant i G. G. Stokes\cite{stokes} wyprowadzili je przyjmując założenie, że naprężenia normalne i styczne są liniowymi funkcjami prędkości odkształceń.\newline\newline
+\textbf{Równania Naviera–Stokesa} stanowią podstawowy zestaw równań opisujących ruch płynów, zarówno cieczy, jak i gazów. Pierwotnie zostały one wyprowadzone przez L. Naviera i S. D. Poissona\cite{navier} na podstawie rozważań dotyczących sił międzycząsteczkowych. Z kolei B. Saint-Venant i G. G. Stokes\cite{stokes} wyprowadzili je przyjmując założenie, że naprężenia normalne i styczne są liniowymi funkcjami prędkości odkształceń.\newline\newline
 Ich sformułowanie opiera się na zasadzie zachowania pędu, zgodnie z którą zmiany pędu elementarnej objętości płynu wynikają z oddziaływania sił działających na ten element. 
 Równania zakładają że zmiany zależą od sił lepkości, sił wynikających z ciśnienia oraz sił masowych, takich jak siła grawitacji.\newline\newline
 
@@ -251,7 +250,7 @@ Ponieważ zastosowana wersja symulacji nie zakłada sił innych niż siła grawi
 
 
 \subsubsection{Metoda cząstek wygładzonych}
-\textbf{Metoda cząstek wygładzonych} (ang. Smoothed Particle Hydrophysics - SPH)\cite{sph} to bezsiatkowa metoda numeryczna stosowana do symulacji przepływów płynów i innych zjawisk ciągłych. Pierwotnie opracowana do symulacji zjawisk astrofizycznych aktualnie znajduje zastsowanie m.in. w mechanice płynów, inżynierii materiałowej, czy grafice komputerowej. Brak zastosowania siatki obliczeniowej jest dużą zaletą tej metody, pozwalającą na modelowanie znacznych deformacji, swobodnych powierzchni i zjawisk nieciągłych.\newline\newline
+\textbf{Metoda cząstek wygładzonych} (ang. Smoothed Particle Hydrophysics - SPH)\cite{sph} to bezsiatkowa metoda numeryczna stosowana do symulacji przepływów płynów i innych zjawisk ciągłych. Pierwotnie opracowana do symulacji zjawisk astrofizycznych aktualnie znajduje zastosowanie m.in. w mechanice płynów, inżynierii materiałowej, czy grafice komputerowej. Brak zastosowania siatki obliczeniowej jest dużą zaletą tej metody, pozwalającą na modelowanie znacznych deformacji, swobodnych powierzchni i zjawisk nieciągłych.\newline\newline
 \indent
 W metodzie tej ośrodek ciągły jest reprezentowany jako zbiór dyskretnych cząstek, które zawierają informację o lokalnych wartościach pól takich jak masa, gęstość, prędkość itp. Każda z cząstek oddziałowuje jedynie z cząstkami które znajdują się w jej bezpośrednim sąsiedztwie określonym przez promień wygładzania $h$. Wartości pól w danym punkcie przestrzeni są aproksymowane za pomocą funkcji wygładzającej, która dyktuje wagę z jaką uwzględniany jest wkład cząstek sąsiadujących w zależności od odległości.\newline\newline
 Podstawą metody jest przybliżenie całki opisującej wielkość fizyczną w postaci sumy po cząstkach (równanie nr. \ref{eqn6}).\newline
@@ -291,7 +290,7 @@ p=k\rho
 \end{equation}
 \indent
 Gdzie $k$ to stała gazu zależna od temperatury.\newline\newline
-Desburn\cite{desburn} sugeruje wykorzystanie zmodyfikowanej wersji równania (rówananie nr. \ref{eqn10}).\newline
+Desburn\cite{desburn} sugeruje wykorzystanie zmodyfikowanej wersji równania (równanie nr. \ref{eqn10}).\newline
 \begin{equation}\label{eqn10}
 p=k(\rho - \rho_0)
 \end{equation}
@@ -398,7 +397,7 @@ EndFunction
 
 
 \subsubsection{Bliskie ciśnienie}
-W celu poprawy stabilności symulacji stosuje się dodatkowe wyrażenie odpowiadające za siłę bliskiego ciśnienia (rówananie nr. \ref{eqn14}). 
+W celu poprawy stabilności symulacji stosuje się dodatkowe wyrażenie odpowiadające za siłę bliskiego ciśnienia (równanie nr. \ref{eqn14}). 
 Jej celem jest zapobieganie zbyt dużemu zbliżaniu się cząstek do siebie.\newline
 \begin{equation}\label{eqn14}
 f_i = -k_{near}\sum_j m_j \frac{1}{\rho_j}\nabla W(r_i - r_j, h),
@@ -422,7 +421,7 @@ $t$ - czas przewidywania.\newline
 
 \subsubsection{Funkcje wygładzające}
 Metoda wygładzonych cząstek opiera się na funkcjach wygładzania. Są to funkcje określające wzajemny wpływ cząstek w zależności od odległości.\newline
-Funkcje wygładzania można traktować jako prostą zależność (rówananie nr. \ref{eqn16}).
+Funkcje wygładzania można traktować jako prostą zależność (równanie nr. \ref{eqn16}).
 \begin{equation}\label{eqn16}
 W(r,h) = 
 \begin{cases}
@@ -468,8 +467,8 @@ Po zakończeniu wykonywania jądra wyniki obliczeń są zapisywane w pamięci pr
 \indent
 Zastosowanie procesora graficznego przyspieszyć działanie programu dzięki kilku kluczowym mechanizmom:\newline
 \textbf{Równoległość danych} - procesor graficzny umożliwia jednoczesne przetwarzanie tych samych operacji dla dużej ilości danych,\newline
-\textbf{Wysoka przepustowość obliczeniowa} - procesor graficzny posiada znacznie większą liczbę jednostek arytmetyczno logicznych niż CPU, co przekłada się na wysoką liczbę operaacji zmiennoprzecinkowych wykonywanych w określonym czasie,\newline
-\textbf{Minimalizacja} wpływu opóżnień pamięci - procesor graficzny może przełączać się pomiędzy wątkami podczas oczekiwania na dostęp do pamięci, co minimalizuje wpływ opóżnień pamięci na czas obliczeń,\newline
+\textbf{Wysoka przepustowość obliczeniowa} - procesor graficzny posiada znacznie większą liczbę jednostek arytmetyczno logicznych niż CPU, co przekłada się na wysoką liczbę operacji zmiennoprzecinkowych wykonywanych w określonym czasie,\newline
+\textbf{Minimalizacja} wpływu opóźnień pamięci - procesor graficzny może przełączać się pomiędzy wątkami podczas oczekiwania na dostęp do pamięci, co minimalizuje wpływ opóżnień pamięci na czas obliczeń,\newline
 \textbf{Korzystna architektura pamięci} - współdzielenie pamięci lokalnej przez wątki w ramach bloku pozwala na szybki dostęp i zmniejszenie konieczności odwoływań do pamięci globalnej.\newline
 
 \newpage
@@ -477,7 +476,7 @@ Zastosowanie procesora graficznego przyspieszyć działanie programu dzięki kil
 \subsection{Odnajdywanie siłowe}
 Najprostszym sposobem odnajdywania cząstek sąsiadujących jest użycie metody siłowej (eng. brute-force). 
 Metoda polega na przeszukaniu zbioru cząstek i sprawdzenia odległości od cząstki aktualnie analizowanej.\newline
-Oznacza to że dla każdej możliwej pary cząstek konieczne jest wykonanie prównania odległości z promieniem wygładzania (równanie nr. \ref{eqn19}).\newline
+Oznacza to że dla każdej możliwej pary cząstek konieczne jest wykonanie porównania odległości z promieniem wygładzania (równanie nr. \ref{eqn19}).\newline
 \begin{equation}\label{eqn19}
 ||r_i-r_j|| \leq h.
 \end{equation}
@@ -632,7 +631,7 @@ Wizualny charakter edytora pozwala na wygodne projektowanie scen bez koniecznoś
 \subsection{Działanie}
 W ramach pracy wykonano z użyciem metody SPH.\newline
 Symulacja w środowisku unity pozwala na manipulowanie parametrami poprzez edytor parametrów unity.\newline
-Przykładowe wizualizacje zachowania cieczy osiągnięte w symulacji zostały przedsstawione na rys. \hyperref[implementacja_1]{4}, \hyperref[implementacja_2]{5}, \hyperref[implementacja_3]{6} i \hyperref[implementacja_4]{7}.\newline
+Przykładowe wizualizacje zachowania cieczy osiągnięte w symulacji zostały przedstawione na rys. \hyperref[implementacja_1]{4}, \hyperref[implementacja_2]{5}, \hyperref[implementacja_3]{6} i \hyperref[implementacja_4]{7}.\newline
 
 \begin{center}
     \includegraphics[width=6.2in]{gravity.png}
@@ -692,7 +691,7 @@ void PredictPositions(uint3 id : SV_DispatchThreadID)
 }
 \end{lstlisting}
 \noindent
-Na podstawie aktualnej pozycji i prędkości obliczana jest pozycja cząstki, która posłyży do obliczeń sił wpływających na tę cząstkę (listing nr. \ref{lst4.7}).\newline
+Na podstawie aktualnej pozycji i prędkości obliczana jest pozycja cząstki, która posłuży do obliczeń sił wpływających na tę cząstkę (listing nr. \ref{lst4.7}).\newline
 
 \subsection{Jądro gęstości}
 \begin{lstlisting}[caption=Jądro gęstości, label={lst4.8}]
