@@ -19,53 +19,67 @@
 \usepackage{algpseudocode}
 \usepackage{pgfplots}
 \usepackage{pdfpages}
+\usepackage{hyperref}
+
+\usepackage{listings}
+\lstset{frame=Trbl,numbers=left,breaklines=true}
+\lstdefinelanguage{Pseudocode}{
+  keywords={If, EndIf, Else, For, EndFor, Function, EndFunction, continue, break
+  },
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  breakilnes=true
+}
 
 \title{Praca inżynierska}
-\author{ehhhhhhhhh}
+\author{Filomena Lisicka}
 
 \begin{document}
+\renewcommand{\thelstlisting}{\thesection.\arabic{lstlisting}}
 \includepdf{Strona tytułowa.pdf}
 \tableofcontents
 \newpage
 
 \section{Wstęp}
-Obliczenia numeryczne dotyczące symulacji płynów odgrywają kluczową rolę we współczesnej inżynierii i naukach techninych. 
-Opiera się na nich wiele dziedzin oraz sektorów branżowych takich jak: inżynieria chemiczna, energetyka, lotnictwo, motoryzacja, meteorologia, a także przemysły growy i rozrywkowy. 
-Dzięki nim możliwa jest uzyskanie zadawalających rezultatów przewidywania zachowania cieczy bez konieczności przeprowadzania czasochłonnych i skomplikowanych obliczeń 
+\subsection{Motywacja}
+Obliczenia numeryczne dotyczące symulacji płynów odgrywają kluczową rolę we współczesnej inżynierii i naukach technicznych. 
+Opiera się na nich wiele dziedzin oraz sektorów branżowych takich jak: inżynieria chemiczna, energetyka, lotnictwo, motoryzacja, meteorologia, a także przemysły gier komputerowych i rozrywkowy. 
+Dzięki nim możliwe jest uzyskanie zadawalających rezultatów przewidywania zachowania cieczy bez konieczności przeprowadzania czasochłonnych i skomplikowanych obliczeń 
 bądź odwzorowywania układów o dużej złożoności.\newline\newline
 
 Wzrost dokładności modeli fizycznych oraz zapotrzebowań na rozdzielczość i wyprzedzenie dokonywanych obliczeń powoduje wzrost wymaganej mocy obliczeniowej i pamięci. 
 Złożoność obliczeniowa problemu symulacji powoduje że istotnym ograniczeniem może być czas jej wykonania. Konsekwentnie wysokiego znaczenia nabierają metody optymalizacji, 
 których celem jest ograniczenie wykorzystywanej pamięci oraz czasu koniecznego do przeprowadzenia obliczeń.\newline
 
-\newpage
-\section{Cel i zakres}
+\subsection{Cel i zakres}
 Celem niniejszej pracy inżynierskiej jest zaproponowanie i analiza rozwiązań dotyczących optymalizacji symulacji płynów. 
-Praca koncentruje się na rozwiązaniach dotyczących metod wyszukiwania cząstek sąsiadujących w metodzie cząstek wygładzonych (SPH) opartej o równania Naviera-Stokesa.\newline\newline
+Praca koncentruje się na rozwiązaniach dotyczących metod wyszukiwania cząstek sąsiadujących w \textbf{metodzie cząstek wygładzonych} (SPH) opartej o równania Naviera-Stokesa.\newline\newline
 
-Zakres pracy obejmuje omówienie podstaw teoretycznych dotyczących symulacji płynów, zaproponowanie metod optymalizacji i ich analizę teoretyczną, 
+Zakres pracy obejmuje omówienie podstaw teoretycznych dotyczących symulacji płynów, zaproponowanie metod optymalizacji i ich analizę, 
 oraz przedstawienie wyników zastosowania tychże metod w praktyce. Uzyskane rezultaty mogą stanowić podstawę do dalszych badań na temat optymalizacji 
 oraz praktycznego wykorzystania wypracowanych rozwiązań.\newline
 
 \newpage
 \section{Wstęp teoretyczny}
 \subsection{Równania Naviera-Stokesa}
-Równania Naviera–Stokesa stanowią podstawowy zestaw równań opisujących ruch płynów, zarówno cieczy, jak i gazów. 
+\textbf{Równania Naviera–Stokesa}\cite stanowią podstawowy zestaw równań opisujących ruch płynów, zarówno cieczy, jak i gazów. Pierwotnie zostały one wyprowadzone przez L. Naviera i S. D. Poissona\cite{navier} na podstawie rozważań dotyczących sił międzycząsteczkowych. Z kolei B. Saint-Venant i G. G. Stokes\cite{stokes} wyprowadzili je przyjmując założenie, że naprężenia normalne i styczne są liniowymi funkcjami prędkości odkształceń.\newline\newline
 Ich sformułowanie opiera się na zasadzie zachowania pędu, zgodnie z którą zmiany pędu elementarnej objętości płynu wynikają z oddziaływania sił działających na ten element. 
-Równania zakładają że zmiany zależą od sił lepkości, sił wynikających z ciśnienia oraz sił masowych, takich jak siła grawitacji.\newline
+Równania zakładają że zmiany zależą od sił lepkości, sił wynikających z ciśnienia oraz sił masowych, takich jak siła grawitacji.\newline\newline
 
 Równania zapisane są w postaci równań różniczkowych cząstkowych i do ich rozwiązania niezbędne jest zastosowanie narzędzi rachunku różniczkowego i całkowego. 
 Przez wzgląd na swoją nieliniowość oraz sprzężenie pomiędzy składowymi prędkości, ich rozwiązanie stanowi istotne wyzwanie obliczeniowe, co powoduje, 
-że uzyskanie rozwiązań drogą analityczną jest realistyczne jedynie w najprostszych przypadkach, takich jak ustalony, laminarny i nieturbulentny przepływ w geometriach prostych.\newline
+że uzyskanie rozwiązań drogą analityczną jest realistyczne jedynie w najprostszych przypadkach, takich jak ustalony, laminarny i nieturbulentny przepływ w geometriach prostych.\newline\newline
 
 W przypadkach bardziej złożonych zagadnień, w szczególności przepływów niestacjonarnych, trójwymiarowych lub turbulentnych, 
 stosowanych m.in. w obliczeniach aerodynamicznych i inżynierskich, konieczne jest wykorzystanie metod numerycznych. 
-Metody te, implementowane w narzędziach obliczeniowej mechaniki płynów (CFD), umożliwiają przybliżone rozwiązanie równań Naviera–Stokesa i analizę rzeczywistych zjawisk przepływowych, 
-które nie są możliwe do opisania metodami analitycznymi.\newline
-
-Zapis równań Naviera-Stokesa w kartezjańskim układzie współrzędnych wygląda następująco:\newline
-
-$$ 
+Metody te, implementowane w narzędziach \textbf{obliczeniowej mechaniki płynów} (CFD), umożliwiają przybliżone rozwiązanie równań Naviera–Stokesa i analizę rzeczywistych zjawisk przepływowych, 
+które nie są możliwe do opisania metodami analitycznymi.\newline\newline
+\noindent
+Zapis równań Naviera-Stokesa w kartezjańskim układzie współrzędnych jest widoczny na równaniu nr. \ref{eqn1}\newline
+\begin{equation}\label{eqn1}\\ 
 \rho 
 \frac{du }{dt }
 = X 
@@ -78,7 +92,7 @@ $$
     \right )  
 \right ] 
 +
-$$
+\end{equation}
 
 $$ 
 + 
@@ -174,23 +188,23 @@ $$
 + \frac{\partial (\rho w) }{\partial z}
 = 0,
 $$
-
-gdzie:\newline
+\indent
+Gdzie:\newline
 $w$ - wektor prędkości o rzutach u, v, w na osie współrzędnych x, y, z,\newline
 $p$ - ciśnienie,\newline
 $\rho$ - gęstość,\newline
 $\mu$ - współczynnik lepkości,\newline
 $X,Y,Z$ - rzuty wektora sił masowych K na osie współrzędnych,\newline
 $\frac{dw}{dt} = \frac{\partial w}{\partial t} + w \space grad \space w$ - pochodna substancjonalna.\newline
-
+\noindent
 Równania są wyprowadzone na podstawie Newtonowskiego uogólnionego prawa tarcia.
 Analiza płynów ściśliwych wymaga dodatkowo zastosowania równań uwzględniających ciśnienie, gęstość, temperaturę i przepływy energii.
-Dla nieściśliwych izotermicznych płynów, równania przyjmują następującą formę:\newline
-$$
+Dla nieściśliwych izotermicznych płynów, równania przyjmują formę przedstawioną na równaniu nr. \ref{eqn2}\newline
+\begin{equation}\label{eqn2}
 \rho \frac {dw}{dt}
 = \boldsymbol{K} - grad \space \rho
 + \mu \Delta \boldsymbol{w},
-$$
+\end{equation}
 $$
 div \space \boldsymbol{w} = 0.
 $$
@@ -198,26 +212,28 @@ $$
 
 \subsection{Metoda cząsteczkowa symulacji}
 \subsubsection{Równania Naviera-Stokesa}
-Przyjmijmy następującą formę równań dla cieczy nieściśliwych:\newline
-$$
+Przyjmijmy formę równań\cite{sca03} dla cieczy nieściśliwych przedstawioną na równaniu nr. \ref{eqn3}\newline
+\begin{equation}\label{eqn3}
 \rho \left (
     \frac{\partial v}{\partial t} + v \nabla v
 \right )
 = - \nabla p + \rho f_{zew} + \mu \nabla^2v,
-$$
+\end{equation}
 $$
 \frac{\partial \rho}{\partial t} + \nabla(\rho v) = 0
 $$
 
 Wykorzystanie metody cząsteczkowej pozwala na pewne uproszczenia, mianowicie:\newline
 (1) Stała liczba cząsteczek zapewnia zachowanie masy wewnątrz systemu,\newline
-(2) wyrażenie (wstaw wyrażenie) może zostać zastąpione operatorem Stokesa(wstaw drugie). 
+(2) wyrażenie $\frac{\partial v}{\partial t} + v \nabla v$ może zostać zastąpione operatorem Stokesa$\frac{D v}{D t}$. 
 Ponieważ cząstki poruszają się wraz z płynem operator Stokesa pola prędkości jest pochodną czasu prędkości co znaczy, że wyrażenie $v \nabla v$ nie jest potrzebne.\newline\newline
-Oznacza to że równanie przyjmuje następującą formę:\newline
-$$
+Po przekształceniu otrzymujemy równianie nr. \ref{eqn4}\newline
+\begin{equation}\label{eqn4}
 \rho \frac{D v}{D t}
 = - \nabla p + \rho f_{zew} + \mu \nabla^2v,
-$$
+\end{equation}
+\newline
+\indent
 Prawa strona równania składa się z trzech składowych:\newline
 $- \nabla p$- odwrotność gradientu ciśnienia,\newline
 Odpowiada za siły wynikające z miejscowych różnic w ciśnieniu wewnątrz płynu.\newline
@@ -226,21 +242,23 @@ $\rho f_{zew}$ - siły zewnętrzne,\newline
 Odpowiadają siłom jednorodnym w symulowanej przestrzeni. Dotyczą one sił zewnętrznych jak grawitacja, a w przypadku symulacji objętości płynów poddawanych innym przyśpieszeniom wynikającym na przykład z ruchu ośrodka, również takowym.\newline\newline
 $\mu \nabla^2v$ - siły lepkości.\newline
 Siły powodujące wygładzenie pola prędkości płynu spowodowane jego lepkością.\newline\newline
-Ponieważ zastosowana wersja symulacji nie zakłada sił innych niż siła grawitacji równanie wygląda następująco:\newline
-$$
+Ponieważ zastosowana wersja symulacji nie zakłada sił innych niż siła grawitacji możemy wykorzystać równanie nr. \ref{eqn5}\newline
+\begin{equation}\label{eqn5}
 \rho \frac{D v}{D t}
 = - \nabla p + \rho g + \mu \nabla^2v.
-$$
+\end{equation}
 
 
 
 \subsubsection{Metoda cząstek wygładzonych}
-Metoda cząstek wygładzonych (ang. Smoothed Particle Hydrophysics - SPH) to bezsiatkowa metoda numeryczna stosowana do symulacji przepływów płynów i innych zjawisk ciągłych. Pierwotnie opracowana do symulacji zjawisk astrofizycznych aktualnie znajduje zastsowanie m.in. w mechanice płynów, inżynierii materiałowej, czy grafice komputerowej. Brak zastosowania siatki obliczeniowej jest dużą zaletą tej metody, pozwalającą na modelowanie znacznych deformacji, swobodnych powierzchni i zjawisk nieciągłych.\newline\newline
+\textbf{Metoda cząstek wygładzonych} (ang. Smoothed Particle Hydrophysics - SPH)\cite{sph} to bezsiatkowa metoda numeryczna stosowana do symulacji przepływów płynów i innych zjawisk ciągłych. Pierwotnie opracowana do symulacji zjawisk astrofizycznych aktualnie znajduje zastsowanie m.in. w mechanice płynów, inżynierii materiałowej, czy grafice komputerowej. Brak zastosowania siatki obliczeniowej jest dużą zaletą tej metody, pozwalającą na modelowanie znacznych deformacji, swobodnych powierzchni i zjawisk nieciągłych.\newline\newline
+\indent
 W metodzie tej ośrodek ciągły jest reprezentowany jako zbiór dyskretnych cząstek, które zawierają informację o lokalnych wartościach pól takich jak masa, gęstość, prędkość itp. Każda z cząstek oddziałowuje jedynie z cząstkami które znajdują się w jej bezpośrednim sąsiedztwie określonym przez promień wygładzania $h$. Wartości pól w danym punkcie przestrzeni są aproksymowane za pomocą funkcji wygładzającej, która dyktuje wagę z jaką uwzględniany jest wkład cząstek sąsiadujących w zależności od odległości.\newline\newline
-Podstawą metody jest przybliżenie całki opisującej wielkość fizyczną w postaci sumy po cząstkach:\newline
-$$
+Podstawą metody jest przybliżenie całki opisującej wielkość fizyczną w postaci sumy po cząstkach (równanie nr. \ref{eqn6}).\newline
+\begin{equation}\label{eqn6}
 A(r) \approx \sum_{j}A_j \frac{m_j}{\rho_j}W(r-r_j,h),
-$$
+\end{equation}
+\indent
 Gdzie:\newline
 $A$ - dowolna wielkość fizyczna,\newline
 $m$ - masa cząstki,\newline
@@ -257,230 +275,239 @@ Dlatego też metoda SPH wymaga zastosowania technik optymalizacyjnych i doboru o
 
 
 \subsubsection{Ciśnienie}
-Zastosowanie metody SPH dla ciśnienia opisanego jako wyrażenie $- \nabla p$:
-$$
+Zastosowanie metody SPH dla ciśnienia opisanego jako wyrażenie $- \nabla p$ (równanie nr. \ref{eqn7}).
+\begin{equation}\label{eqn7}
 f_i = -\sum_j m_j \frac{p_j}{\rho_j}\nabla W(r_i - r_j, h),
-$$
+\end{equation}
 Wstępna analiza równania pozwala zauważyć, że dla dwóch oddziałujących cząstek siła ta nie jest symetryczna. 
 Jest to spowodowane możliwością wystąpienia różnicy ciśnień w miejscach dwóch cząstek. Istnieje wiele metod wyrównania tych sił. 
-Jedną z nich jest proste uśrednienie wartości ciśnienia tychże cząstek:\newline
-$$
+Jedną z nich jest proste uśrednienie wartości ciśnienia tychże cząstek (równanie nr. \ref{eqn8}).\newline
+\begin{equation}\label{eqn8}
 f_i = -\sum_j m_j \frac{p_j + p_i}{2\rho_j}\nabla W(r_i - r_j, h),
-$$
-Ciśnienie $p$ wyznaczane jest równaniem gazu idealnego:\newline
-$$
+\end{equation}
+Ciśnienie $p$ wyznaczane jest równaniem gazu idealnego (równanie nr. \ref{eqn9}).\newline
+\begin{equation}\label{eqn9}
 p=k\rho
-$$
-gdzie $k$ to stała gazu zależna od temperatury.\newline\newline
-Desburn sugeruje wykorzystanie zmodyfikowanej wersji równania:\newline
-$$
+\end{equation}
+\indent
+Gdzie $k$ to stała gazu zależna od temperatury.\newline\newline
+Desburn\cite{desburn} sugeruje wykorzystanie zmodyfikowanej wersji równania (rówananie nr. \ref{eqn10}).\newline
+\begin{equation}\label{eqn10}
 p=k(\rho - \rho_0)
-$$
-gdzie $\rho_0$ jest gęstością spoczynku.\newline\newline
-Pozwala to na wyznaczenie gęstości do której dążyć będzie symulowany płyn jako łatwo modyfikowalny parametr.\newline
+\end{equation}
+\indent
+Gdzie $\rho_0$ jest gęstością spoczynku.\newline\newline
+Pozwala to na wyznaczenie gęstości, do której dążyć będzie symulowany płyn jako łatwo modyfikowalny parametr.\newline
 Ponieważ równania zależą od gradientu ciśnienia, przesunięcie nie wpływa na obliczenia siły.\newline
+\noindent
+Pseudokod równania ciśnienia z uwzględnieniem symetryzacji sił został przedstawiony na listingu nr. \ref{lst2.1}\newline
 
-Postać pseudokodowa równania ciśnienia z uwzględnieniem symetryzacji sił wygląda następująco:\newline
-\begin{algorithm}
-\caption{Pressure Computation}
-\begin{algorithmic}[1]
-\Function{ComputePressure}{particleId}
-    \State $density \gets Densities[particleId]$
-    \State $pressure \gets (density - targetDensity) \cdot pressureConstant$
-    \State $pressureForce \gets (0, 0)$
 
-    \State $position \gets ParticlePositions[particleId]$
-    \State $sqrSmoothingRadius \gets smoothingRadius^2$
+\begin{lstlisting}[language=Pseudocode,mathescape=true,caption=Obliczenia ciśnienia,label={lst2.1}]
+Function COMPUTE PRESSURE(particleId)
+    $density \gets Densities[particleId]$
+    $pressure \gets (density - targetDensity) \cdot pressureConstant$
+    $pressureForce \gets (0, 0)$
 
-    \For{$secondParticleId \gets 0$ to $numParticles - 1$}
-        \If{$secondParticleId = particleId$}
-            \State \textbf{continue}
-        \EndIf
+    $position \gets ParticlePositions[particleId]$
+    $sqrSmoothingRadius \gets smoothingRadius^2$
 
-        \State $secondPosition \gets ParticlePositions[secondParticleId]$
-        \State $vector \gets secondPosition - position$
-        \State $sqrDistance \gets \text{dot}(vector, vector)$
-        \State $distance \gets \sqrt{sqrDistance}$
+    For($secondParticleId \gets 0$ to $numParticles - 1$)
+        If($secondParticleId = particleId$)
+            continue
+        EndIf
 
-        \If{$distance > 0$}
-            \State $direction \gets vector / distance$
-        \Else
-            \State $direction \gets (0,1)$
-        \EndIf
+        $secondPosition \gets ParticlePositions[secondParticleId]$
+        $vector \gets secondPosition - position$
+        $sqrDistance \gets \text{dot}(vector, vector)$
+        $distance \gets \sqrt{sqrDistance}$
 
-        \State $secondPressure \gets PressureFromDensity(Densities[secondParticleId])$
-        \State $sharedPressure \gets (pressure + secondPressure) / 2$
+        If($distance > 0$)
+            $direction \gets vector / distance$
+        Else
+            $direction \gets (0,1)$
+        EndIf
 
-        \State $pressureForce \gets pressureForce +$
-        \Statex \hspace{1.5em}
-        $direction \cdot DensityDerivative(distance, smoothingRadius)
+        $secondPressure \gets PressureFromDensity(Densities[secondParticleId])$
+        $sharedPressure \gets (pressure + secondPressure) / 2$
+
+        $pressureForce \gets pressureForce + direction \cdot$ $DensityDerivative(distance, smoothingRadius)
         \cdot \dfrac{sharedPressure}{Densities[secondParticleId]}$
-    \EndFor
+    EndFor
 
-    \State $acceleration \gets pressureForce / density$
-    \State $Velocities[particleId] \gets Velocities[particleId] + acceleration \cdot timeStep$
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
+    $acceleration \gets pressureForce / density$
+    $Velocities[particleId] \gets Velocities[particleId] + acceleration \cdot timeStep$
+EndFunction
+\end{lstlisting}
 
-
+\newpage
 \subsubsection{Siły zewnętrzne}
-Obliczenia dla siły grawitacji możemy sprowadzić do prostej równości:\newline
-$$
+Obliczenia dla siły grawitacji możemy sprowadzić do prostej równości (rówanienie nr. \ref{eqn11}).\newline
+\begin{equation}\label{eqn11}
 f_i = g
-$$
-
-W formie pseudokodu:\newline
-\begin{algorithm}
-\caption{Obliczenia siły grawitacji}
-\begin{algorithmic}[1]
-\Function{CalculateExternalForces}{particleId}
-    \State $forces \gets (0,0)$
-    \State $forces \gets forces + (0, gravity)$
-    \State $Velocities[particleId] \gets Velocities[particleId] + forces \cdot timeStep$
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
+\end{equation}
+\noindent
+Równanie w formie pseudokodu widoczne na listingu nr. \ref{lst2.2}\newline
+\begin{lstlisting}[language=Pseudocode,mathescape=true,caption=Siły zewnętrzne,label={lst2.2}]
+Function CALCULATE EXTERNAL FORCES(particleId)
+    $forces \gets (0,0)$
+    $forces \gets forces + (0, gravity)$
+    $Velocities[particleId] \gets Velocities[particleId] + forces \cdot timeStep$
+EndFunction
+\end{lstlisting}
 
 \subsubsection{Lepkość}
-Wyrażenie dla lepkości $\mu \nabla^2v$ przekształcone do sumy:\newline
-$$
+Wyrażenie dla lepkości $\mu \nabla^2v$ przekształcone do sumy (rówanienie nr. \ref{eqn12}).\newline
+\begin{equation}\label{eqn12}
 f_i = \mu\sum_j m_j \frac{v_j}{\rho_j}\nabla^2W(r_i-r_j,h)
-$$
-Jak widać również skutkuje siłami asymetrycznymi. Ponieważ siły te operują na różnicach prędkości, naturalnym jest usymetryzowanie ich na różnicach prędkości:\newline
-$$
+\end{equation}
+Jak widać również skutkuje siłami asymetrycznymi. Ponieważ siły te operują na różnicach prędkości, naturalnym jest usymetryzowanie ich na różnicach prędkości (rówanienie nr. \ref{eqn13}).\newline
+\begin{equation}\label{eqn13}
 f_i = \mu\sum_j m_j \frac{v_j-v_i}{\rho_j}\nabla^2W(r_i-r_j,h)
-$$
+\end{equation}
+\noindent
+Równanie w formie pseudokodu widoczne na listingu nr. \ref{lst2.3}\newline
+\begin{lstlisting}[language=Pseudocode,mathescape=true,caption=Obliczenia lepkości,label={lst2.3}]
+Function CALCULATE VISCOSITY(particleId)
+    $position \gets ParticlePositions[particleId]$
+    $sqrSmoothingRadius \gets smoothingRadius^2$
 
-Pseudokod:\newline
-\begin{algorithm}
-\caption{Obliczenia lepkości}
-\begin{algorithmic}[1]
-\Function{CalculateViscosity}{particleId}
-    \State $position \gets ParticlePositions[particleId]$
-    \State $sqrSmoothingRadius \gets smoothingRadius^2$
+    $viscosityForce \gets (0,0)$
+    $velocity \gets Velocities[particleId]$
 
-    \State $viscosityForce \gets (0,0)$
-    \State $velocity \gets Velocities[particleId]$
+    For($secondParticleId \gets 0$ to $numParticles - 1$)
+        If($secondParticleId = particleId$)
+            continue
+        EndIf
 
-    \For{$secondParticleId \gets 0$ to $numParticles - 1$}
-        \If{$secondParticleId = particleId$}
-            \State \textbf{continue}
-        \EndIf
+        $secondPosition \gets ParticlePositions[secondParticleId]$
+        $vector \gets secondPosition - position$
+        $sqrDistance \gets \Call{dot}{vector, vector}$
+        $distance \gets \sqrt{sqrDistance}$
 
-        \State $secondPosition \gets ParticlePositions[secondParticleId]$
-        \State $vector \gets secondPosition - position$
-        \State $sqrDistance \gets \Call{dot}{vector, vector}$
-        \State $distance \gets \sqrt{sqrDistance}$
-
-        \State $secondVelocity \gets Velocities[secondParticleId]$
-        \State $viscosityForce \gets viscosityForce +
+        $secondVelocity \gets Velocities[secondParticleId]$
+        $viscosityForce \gets viscosityForce +
                (secondVelocity - velocity)
-               \cdot ViscosityKernel(distance, smoothingRadius)$
-    \EndFor
+               \cdot $$ViscosityKernel(distance, smoothingRadius)$
+    EndFor
 
-    \State $Velocities[particleId] \gets Velocities[particleId] +
+    $Velocities[particleId] \gets Velocities[particleId] +
            viscosityForce \cdot viscosityStrength \cdot timeStep$
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
+EndFunction
+\end{lstlisting}
 
 
-\subsubsection{Bliska gęstość}
-W celu poprawy stabilności symulacji stosuje się dodatkowe wyrażenie odpowiadające za bliską gęstość cząstek. 
-Jego celem jest zapobieganie zbyt dużemu zbliżaniu się cząstek do siebie.\newline
-Wyrażenie to ma postać:\newline
-$$
+\subsubsection{Bliskie ciśnienie}
+W celu poprawy stabilności symulacji stosuje się dodatkowe wyrażenie odpowiadające za siłę bliskiego ciśnienia (rówananie nr. \ref{eqn14}). 
+Jej celem jest zapobieganie zbyt dużemu zbliżaniu się cząstek do siebie.\newline
+\begin{equation}\label{eqn14}
 f_i = -k_{near}\sum_j m_j \frac{1}{\rho_j}\nabla W(r_i - r_j, h),
-$$
-Gdzie $k_{near}$ to współczynnik siły bliskiej gęstości.\newline
-Bliska gęstość pozwala na uzyskanie bardziej realistycznego zachowania płynu poprzez zapobieganie nadmiernemu zagęszczeniu cząstek, 
-co powoduje przybliżenie zachowania symulacji do płynów niesprężystych.\newline
-
-Sama postać algorytmu nie różni się znacząco od obliczeń zwykłej gęstości poza zmienionymi funkcjami wygładzającymi.\newline
+\end{equation}
+Gdzie $k_{near}$ to współczynnik siły bliskiego ciśnienia.\newline
+Bliskie ciśnienie pozwala na uzyskanie bardziej realistycznego zachowania płynu poprzez zapobieganie nadmiernemu zagęszczeniu cząstek, co powoduje przybliżenie zachowania symulacji do płynów niesprężystych.\newline
+\noindent
+Sama postać algorytmu nie różni się znacząco od obliczeń zwykłego ciśnienia poza zmienionymi funkcjami wygładzającymi.\newline
 
 \subsubsection{Przewidywanie pozycji}
-Techniką stabilizacji symulacji jest przewidywanie pozycji cząstek w następnym kroku na podstawie ich aktualnego położenia i prędkości.\newline
+Techniką stabilizacji symulacji jest przewidywanie pozycji cząstek\cite{viscoelastic} w następnym kroku na podstawie ich aktualnego położenia i prędkości.\newline
 Oznacza to że w każdym kroku do obliczeń zmiany prędkości cząstki wykorzystujemy nie pozycję aktualną cząstki lecz pozycję przewidzianą.\newline
-Oznacza to że podstawowe równanie metody sph zostaje zmodyfikowane do następującej postaci:\newline
-$$
+Oznacza to że podstawowe równanie metody sph zostaje zmodyfikowane do postaci widocznej na równaniu nr. \ref{eqn15}.\newline
+\begin{equation}\label{eqn15}
 A(r) \approx \sum_{j}A_j \frac{m_j}{\rho_j}W((r+v*t)-(r_j+v_j*t),h),
-$$
-gdzie:\newline
+\end{equation}
+\indent
+Gdzie:\newline
 $v_n$ - prędkość cząstki $n$,\newline
 $t$ - czas przewidywania.\newline
 
 \subsubsection{Funkcje wygładzające}
 Metoda wygładzonych cząstek opiera się na funkcjach wygładzania. Są to funkcje określające wzajemny wpływ cząstek w zależności od odległości.\newline
-Funkcje wygładzania można traktować jako prostą zależność:
-$$
+Funkcje wygładzania można traktować jako prostą zależność (rówananie nr. \ref{eqn16}).
+\begin{equation}\label{eqn16}
 W(r,h) = 
 \begin{cases}
 f(r,h), & dla \space r<h,\\
 0,    & dla \space r>=h
 \end{cases}
-$$
+\end{equation}
 gdzie:\newline
 r - odległość analizowanej cząstki od cząstki sąsiadującej,\newline
 h - promień wygładzania,\newline
 f - funkcja kształtu krzywej.\newline\newline
 Jest to forma nieznormalizowana, co oznacza, że zmiany w wartości $h$ wpływają na całkę obliczanej wartości fizycznej.\newline
-Alternatywną i zazwyczaj stosowaną formą jest wyrażenie funkcji wygładzania z dodatkowym współczynnikiem normalizującym:\newline
-$$
+Alternatywną i zazwyczaj stosowaną formą jest wyrażenie funkcji wygładzania z dodatkowym współczynnikiem normalizującym (równanie nr. \ref{eqn17}).\newline
+\begin{equation}\label{eqn17}
 W(r,h) = 
 \begin{cases}
 m(h)f(r,h), & dla \space r<h,\\
 0,    & dla \space r>=h
 \end{cases}
-$$
-Gdzie $m$ to funkcja promienia wygładzania, która służy jako współczynnik standaryzujący. Jej celem jest zachowanie stałej wartości całki funkcji wygładzającej. 
+\end{equation}
+\indent
+Gdzie $m(h)$ to funkcja promienia wygładzania, która służy jako współczynnik standaryzujący. Jej celem jest zachowanie stałej wartości całki funkcji wygładzającej. 
 W przypadku jej niezastosowania zwiększenie promienia wygładzania spowoduje gwałtowny wzrost wartości obliczanego pola. 
 Istnienie współczynnika pozwala na swobodniejszą manipulację promieniem wygładzania, bez niepożądanych zachowań.\newline
-Funkcja $m$ jest określona poniższym wzorem:\newline
-$$
+Funkcja $m(h)$ jest możliwa do wyznaczenia z równania nr. \ref{eqn18}.\newline
+\begin{equation}\label{eqn18}
 \pi hm(h) \int_0^h{f(r,h)} = 1
-$$
-
+\end{equation}
+\noindent
 Dodatkowo w metodzie SPH wykorzystujemy pochodne funkcj wygładzających $\frac {dW(r,h)}{dr}$ celem wyznaczenia gradientów pól cech fizycznych.\newline
 
+\subsection{Jądra obliczeniowe}
+\textbf{Procesor graficzny} (ang. Graphics Processing Unit - GPU) jest układem obliczeniowym zaprojektowanym równoległej realizacji dużej ilości prostych obliczeń. Procesor graficzny składa się z wielu jednostek obliczeniowych zdolnych do jednoczesnego przetwarzania danych. Sprawia to, że procesor graficzny posiadae szerokie zastosowanie w obliczeniach ogólnego przeznaczenia, w tym w symulacjach numerycznych.\newline\newline
+\indent
+\textbf{Jądro obliczeniowe} (ang. kernel) jest funkcją wykonywaną równolegle przez dużą liczbę wątków na procesorze graficznym. Każdy wątek realizuje te same instrukcje programu, lecz operuje na innym fragmencie danych wejściowych. Model ten określany jest jako SIMT (ang. Single Instruction, Multiple Threads).\newline\newline
+\indent
+Proces działania jądra obliczeniowego na procesorze graficznym przebiega w kilku etapach:\newline
+\textbf{Przygotowanie danych} - wymagane dane wejściowe są inicjalizowane w pamięci operacyjnej systemu, a następnie zostają one skopiowane do pamięci procesora graficznego,\newline
+\textbf{Uruchomienie jądra obliczeniowego} - CPU inicjuje jądra, przekazując do procesora graficznego informacje o liczbie wątków oraz ich strukturze (np. siatki bloków i wątków),\newline
+\textbf{Wykonanie obliczeń} - wątki są grupowane w bloki i przydzielane do wieloprocesorów procesora graficznego,\newline
+\textbf{Zakończenie i transfer wyników} - 
+Po zakończeniu wykonywania jądra wyniki obliczeń są zapisywane w pamięci procesora graficznego i w razie potrzeby kopiowane z powrotem do pamięci operacyjnej CPU.\newline\newline
+\indent
+Zastosowanie procesora graficznego przyspieszyć działanie programu dzięki kilku kluczowym mechanizmom:\newline
+\textbf{Równoległość danych} - procesor graficzny umożliwia jednoczesne przetwarzanie tych samych operacji dla dużej ilości danych,\newline
+\textbf{Wysoka przepustowość obliczeniowa} - procesor graficzny posiada znacznie większą liczbę jednostek arytmetyczno logicznych niż CPU, co przekłada się na wysoką liczbę operaacji zmiennoprzecinkowych wykonywanych w określonym czasie,\newline
+\textbf{Minimalizacja} wpływu opóżnień pamięci - procesor graficzny może przełączać się pomiędzy wątkami podczas oczekiwania na dostęp do pamięci, co minimalizuje wpływ opóżnień pamięci na czas obliczeń,\newline
+\textbf{Korzystna architektura pamięci} - współdzielenie pamięci lokalnej przez wątki w ramach bloku pozwala na szybki dostęp i zmniejszenie konieczności odwoływań do pamięci globalnej.\newline
+
+\newpage
 \section{Metody odnajdywania cząstek}
 \subsection{Odnajdywanie siłowe}
 Najprostszym sposobem odnajdywania cząstek sąsiadujących jest użycie metody siłowej (eng. brute-force). 
 Metoda polega na przeszukaniu zbioru cząstek i sprawdzenia odległości od cząstki aktualnie analizowanej.\newline
-Oznacza to że dla każdej możliwej pary cząstek konieczne jest wykonanie prównania odległości z promieniem wygładzania:\newline
-$$
+Oznacza to że dla każdej możliwej pary cząstek konieczne jest wykonanie prównania odległości z promieniem wygładzania (równanie nr. \ref{eqn19}).\newline
+\begin{equation}\label{eqn19}
 ||r_i-r_j|| \leq h.
-$$
-
+\end{equation}
+\noindent
 Jeśli warunek zostanie spełniony to znaczy, że cząstka j jest w sąsiedztwie czątki i i zostaje uwzględniona w dalszych obliczeniach.\newline
+\noindent
+Siłowa metoda wyszukiwania widoczna jest na listingu nr. \ref{lst3.4}\newline
 
-Postać algorytmiczna wyszukiwania metodą siłową:\newline
+\begin{lstlisting}[language=Pseudocode,mathescape=true,caption=Example Listing,label={lst3.4}]
+Function FIND PARTICLE(particleId)
+    $position \gets ParticlePositions[particleId]$
+    $sqrSmoothingRadius \gets smoothingRadius^2$
 
-\begin{algorithm}
-\caption{Metoda siłowa}
-\begin{algorithmic}[1]
-\Function{FindParticle}{particleId}
-    \State $position \gets ParticlePositions[particleId]$
-    \State $sqrSmoothingRadius \gets smoothingRadius^2$
+    For($secondParticleId \gets 0$ to $numParticles - 1$)
+        If($secondParticleId = particleId$)
+            continue
+        EndIf
 
-    \For{$secondParticleId \gets 0$ to $numParticles - 1$}
-        \If{$secondParticleId = particleId$}
-            \State \textbf{continue}
-        \EndIf
+        $secondPosition \gets ParticlePositions[secondParticleId]$
+        $vector \gets secondPosition - position$
+        $sqrDistance \gets \Call{dot}{vector, vector}$
 
-        \State $secondPosition \gets ParticlePositions[secondParticleId]$
-        \State $vector \gets secondPosition - position$
-        \State $sqrDistance \gets \Call{dot}{vector, vector}$
+        If($sqrDistance > sqrSmoothingRadius$)
+            continue
+        EndIf
 
-        \If{$sqrDistance > sqrSmoothingRadius$}
-            \State \textbf{continue}
-        \EndIf
-
-        \State \textit{[make calculations]}
-    \EndFor
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
+        [make calculations]
+    EndFor
+EndFunction
+\end{lstlisting}
 
 
 
@@ -490,47 +517,51 @@ W zastosowaniach praktycznych metody SPH, gdzie liczba cząstek sięga tysiący,
 
 
 \subsection{Siatka jednorodna}
-Jednym z rozwiązań mających na celu przyśpieszenie procesu wyszukiwania cząstek sąsiadujących jest zastosowanie siatki jednorodnej (eng. uniform grid).\newline
+Jednym z rozwiązań mających na celu przyśpieszenie procesu wyszukiwania cząstek sąsiadujących jest zastosowanie \textbf{siatki jednorodnej}\cite{uniform_grid} (eng. uniform grid).\newline
 Metoda ta polega na podziale przestrzeni na regularne komórki o stałym rozmiarze. 
 Rozmiar komórki dostosowywany jest do promienia wygładzania $h$. 
 Uzależnienie to pozwala ustalić stałą, ograniczoną liczbę komórek które należy przeszukać.\newline
 
-
-Każdej cząstce przypisywana jest komórka siatki na podstawie jej pozycji:\newline
-$$
+\noindent
+Każdej cząstce przypisywana jest komórka siatki na podstawie jej pozycji (równanie nr. \ref{eqn20}).\newline
+\begin{equation}\label{eqn20}
 i_n = \frac {x_n} r
-$$
+\end{equation}
+\indent
 Gdzie:\newline
 $i_n$ - indeks cząstki w wymiarze $n$,\newline
 $x_n$ - położenie cząstki wzdłuż osi $n$,\newline
 $r$ - wielkość komórki siatki.\newline\newline
 
-Najczęściej wartość $r$ jest równa, lub nieznacznie większa od odległości interakcji co ogranicza ilość koniecznycj do sprawdzenia komórek wzorem:\newline
-$$
+\noindent
+Najczęściej wartość $r$ jest równa, lub nieznacznie większa od odległości interakcji co ogranicza ilość koniecznych do sprawdzenia komórek (równanie nr. \ref{eqn21}).\newline
+\begin{equation}\label{eqn21}
 n_s = 3^d
-$$
+\end{equation}
+\indent
 Gdzie:\newline
 $n_s$ - liczba komórek koniecznych do sprawdzenia,\newline
 $d$ - liczba wymiarów symulacji.\newline
 
-Zastosowanie siatki pozwala uzależnić złożoność obliczeniową algorytmu od liczby cząstek oczekiwanej wewnątrz sąsiadujących komórek siatki, zamiast od całkowitej liczby cząstek.\newline
+Zastosowanie siatki pozwala uzależnić złożoność obliczeniową algorytmu od liczby cząstek oczekiwanej wewnątrz sąsiadujących komórek siatki, zamiast od całkowitej liczby cząstek. Wizualizacja zastosowania siatki została przedstawiona na rys. \hyperref[teoria_1]{1}.\newline
 \begin{center}
-    \includegraphics[width=6.5in]{MetodaSPH.png}
+    \includegraphics[width=5.8in]{MetodaSPH.png}
     \caption{Rysunek 1: Wizualizacja siatki w metodzie SPH}
     \label{teoria_1}
 \end{center}
 
 \subsection{Haszowanie przestrzenne}
-Haszowanie przestrzenne (ang. spatial hashing) to technika optymalizacji wyszukiwania cząstek sąsiadujących, która stanowi rozwinięcie podejścia opartego na siatce jednorodnej.
-Metoda ta pozwala na odwzorowanie komórek siatki na strukturę o stałym lub ograniczonym rozmiarze, co skutkuje redukcją zużytej pamięci oraz poprawą skalowalności algorytmu.\newline
+\textbf{Haszowanie przestrzenne} (ang. spatial hashing)\cite{spatial_hashing} to technika optymalizacji wyszukiwania cząstek sąsiadujących, która stanowi rozwinięcie podejścia opartego na siatce jednorodnej.
+Metoda ta pozwala na odwzorowanie komórek siatki na strukturę o stałym lub ograniczonym rozmiarze, co skutkuje redukcją zużytej pamięci oraz poprawą skalowalności algorytmu.\newline\newline
+\indent
 Podobnie do przypadku siatki jednorodnej, przestrzeń symulacji dzielona jest na komórki o stałym rozmiarze uzależnionym od promienia wygładzania. 
 Każdej cząstce przypisywany jest indeks komórki na podstawie jej położenia. 
-Jednak zamiast przechowywania pełnowymiarowej tablicy komórek, indeks komórki jest przekształcany za pomocą funkcji haszującej do jednowymiarowego klucza, 
+Jednak zamiast przechowywania pełnowymiarowej tablicy komórek, indeks komórki jest przekształcany za pomocą funkcji haszującej (równanie nr. \ref{eqn22}) do jednowymiarowego klucza, 
 który służy identyfikacji miejsca przechowywania cząstki w tablicy haszującej.\newline
-Standardowa funkcja mieszająca posiada następującą postać:\newline
-$$
-h(x_0,x_1,...,x_i) = (x_0*p_0\oplus x_1*p_1 \oplus ... \oplus x_i*p_i) mod \space M,
-$$
+\begin{equation}\label{eqn22}
+h(x_0,x_1,...,x_i) = (x_0*p_0\oplus x_1*p_1 \oplus ... \oplus x_i*p_i)\space mod \space M,
+\end{equation}
+\indent
 Gdzie:\newline
 $x_n$ - współrzędna komórki w wymiarze $n$,\newline
 $p_n$ - stały współczynnik dla wymiaru $n$,\newline
@@ -538,68 +569,98 @@ $M$ - rozmiar tablicy mieszającej.\newline\newline
 Metoda ta jest szczególnie korzystna w przypadku dużych, dynamicznych scen, w których obszar symulacji jest rozległy, a cząstki zajmują jedynie jego część. 
 Dzięki temu unika się alokowania pamięci dla pustych komórek, co stanowi istotną przewagę nad klasyczną siatką jednorodną.\newline
 Do głównych zalet haszowania przestrzennego należą oszczędność pamięci, wysoka wydajność oraz dobra adaptowalność do implementacji równoległych, w tym na procesorach graficznych. 
-Wśród wad można wymienić konieczność obsługi kolizji w tablicy haszującej oraz większą złożoność implementacyjną w porównaniu do klasycznej siatki jednorodnej.\newline
+Wśród wad można wymienić konieczność obsługi kolizji w tablicy haszującej oraz większą złożoność implementacyjną w porównaniu do klasycznej siatki jednorodnej.\newline\newline
+\indent
 Możliwą do zastosowania optymalizacją jest wykorzystanie tablicy skrótów. 
 Metoda ta polega na pierwotnym przypisaniu każdej cząsteczce wartości odpowiadającej kluczowi komórki w której się znajduje. 
-Następnym krokiem jest posortowanie cząstek według tych właśnie kluczy. Tablica posortowanych cząstek umożliwia na utworzenie tablicy szybkiego dostępu.\newline
+Następnym krokiem jest posortowanie cząstek według tych właśnie kluczy. Tablica posortowanych cząstek umożliwia utworzenie tablicy szybkiego dostępu.\newline
 Tablica ta jest rozmiaru maksymalnego klucza. Każda komórka tablicy zawiera indeks pierwszej cząstki w tablicy posortowanych cząstek, 
-której przypisany klucz odpowiada indeksowi danej komórki.\newline
+której przypisany klucz odpowiada indeksowi danej komórki. Efektem działania jest struktura podobna do tablicy sum prefiksowych, czy wyniku sortowania poprzez sumowanie\cite{algorithms}, z różnicą polegająca na obsłudze dodatkowych danych w postaci cząstek.\cite{cuda}\newline\newline
+\noindent
+Na rys. \hyperref[teoria2]{2} przedstawiony został schemat zawierający przekładową tablicę szybkiego dostępu.\newline
 
 \begin{center}
-    \includegraphics[width=6.5in]{Tablica.png}
+    \includegraphics[width=6.2in]{Tablica.png}
     \caption{Rysunek 2: Schemat działania tablicy skrótów}
     \label{teoria_2}
 \end{center}
-
-Zakładając stałą ilość komórek symulacji i wielkość tablicy mieszającej można wyprowadzić zależność:\newline
-$$
+\noindent
+Zakładając stałą ilość komórek symulacji i wielkość tablicy mieszającej można wyprowadzić zależność widoczną na równaniu nr. \ref{eqn23}.\newline
+\begin{equation}\label{eqn23}
 P_{dup} = 1-(1-\frac 1 M)^{N-1} 
-$$
+\end{equation}
+\indent
 Gdzie:\newline
 $P_{dup}$ - prawdopodobieństwo duplikatu klucza dla pojedynczej komórki,\newline
 $N$ - liczba komórek siatki.\newline
 
 \subsection{Stały indeks}
-Pewną metodą optymalizacji jest wykorzystanie indeksów bez kolizji wyliczanych na podstawie pozycji komórki w siatce. Można zaproponować następujący wzór na indeks komórki:\newline
-$$
+Pewną metodą optymalizacji jest wykorzystanie indeksów bez kolizji wyliczanych na podstawie pozycji komórki w siatce (równanie nr. \ref{eqn24}).\newline
+\begin{equation}\label{eqn24}
 h(x_0,x_1,...,x_i) = (x_0 + x_1*m_0 + ... + x_i*m_i*m_{i-1}*...*m_0),
-$$
+\end{equation}
+\indent
 Gdzie:\newline
-$m_n$ - maksymalna liczba komórek w osi $n$.\newline
-
+$m_n$ - maksymalna liczba komórek w osi $n$.\newline\newline
+\noindent
 Optymalizacja ta wymaga odgórnej stałej wielkości tablicy mieszającej, równej liczbie komórek siatki przestrzennej.\newline
 
+\newpage
 \section{Implementacja symulacji}
-W ramach pracy udało się zaimplementować symulację z użyciem metody sph.\newline
-Symulacja w środowisku unity pozwala na manipulowanie parametrami poprzez edytor parametrów unity.\newline
+\subsection{Środowisko Unity}
+\textbf{Unity} jest silnikiem służącym do tworzenia materiałów interaktywnych, w tym przede wszystkim gier komputerowych.\newline
+Kod źródłowy Unity został napisany głównie w języku C++, podczas gdy samo narzędzie pozwala na pisanie skryptów w trzech językach: UnityScript, C\# oraz Boo (do wersji 4.6.1).\newline
+Podstawą działania Unity jest model oparty na scenach (ang. Scene). Każda aplikacja składa się z jednej lub wielu scen, zawierających hierarchię obiektów gry (ang. Game Object). Obiekty te stanowią podstawowe części środowiska i reprezentują szereg elementów jak postacie, elementy otoczenia czy źródła światła.\newline\newline
+\indent
+Funkcjonalność obiektów gry jest definiowana poprzez zawarte w nich komponenty. Komponenty mogą odpowiadać m.in. za renderowanie grafiki, obsługę kolizji, fizykę ruchu czy logikę sterowania. Pozwala to na projektowanie modularne i wielokrotne wykorzystanie kodu.\newline
 
 \begin{center}
-    \includegraphics[width=6.5in]{gravity.png}
-    \caption{Rysunek 3: Działanie symulacji w standardowych warunkach}
+    \includegraphics[width=6.2in]{unity.png}
+    \caption{Rysunek 3: Widok środowiska Unity}
+    \label{unity}
+\end{center}
+Na rys. \hyperref[unity]{3} widoczny jest zrzut ekranu zrzut ekranu edytora Unity 6000.2.14f1.\newline\newline
+\indent
+Edytor składa się z kilku podstawowych paneli:\newline
+\textbf{Hierarchy} – przedstawia strukturę obiektów zawartych w danej scenie,\newline
+\textbf{Scene View} – służy do edycji i manipulacji obiektów w przestrzeni sceny,\newline
+\textbf{Game View} – prezentuje widok aplikacji z perspektywy użytkownika końcowego,\newline
+\textbf{Inspector} – pozwala na inspekcję i edycję właściwości wybranego obiektu,\newline
+\textbf{Project} – zawiera zasoby wykorzystywane w ramach projektu.\newline\newline
+Wizualny charakter edytora pozwala na wygodne projektowanie scen bez konieczności ręcznego definiowania wszystkich obiektów w kodzie.\newline
+\newpage
+\subsection{Działanie}
+W ramach pracy wykonano z użyciem metody SPH.\newline
+Symulacja w środowisku unity pozwala na manipulowanie parametrami poprzez edytor parametrów unity.\newline
+Przykładowe wizualizacje zachowania cieczy osiągnięte w symulacji zostały przedsstawione na rys. \hyperref[implementacja_1]{4}, \hyperref[implementacja_2]{5}, \hyperref[implementacja_3]{6} i \hyperref[implementacja_4]{7}.\newline
+
+\begin{center}
+    \includegraphics[width=6.2in]{gravity.png}
+    \caption{Rysunek 4: Działanie symulacji w standardowych warunkach}
     \label{implementacja_1}
 \end{center}
 \begin{center}
-    \includegraphics[width=6.5in]{no_gravity.png}
-    \caption{Rysunek 4: Działanie symulacji przy zerowej sile grawitacji}
+    \includegraphics[width=6.2in]{no_gravity.png}
+    \caption{Rysunek 5: Działanie symulacji przy zerowej sile grawitacji}
     \label{implementacja_2}
 \end{center}
 \begin{center}
-    \includegraphics[width=6.5in]{high_density.png}
-    \caption{Rysunek 5: Działanie symulacji po ustawieniu wysokiej gęstości docelowej}
+    \includegraphics[width=6.2in]{high_density.png}
+    \caption{Rysunek 6: Działanie symulacji po ustawieniu wysokiej gęstości docelowej}
     \label{implementacja_3}
 \end{center}
 \begin{center}
-    \includegraphics[width=6.5in]{no_viscosity.png}
-    \caption{Rysunek 6: Działanie symulacji przy ustawieniu zerowej siły lepkości}
+    \includegraphics[width=6.2in]{no_viscosity.png}
+    \caption{Rysunek 7: Działanie symulacji przy ustawieniu zerowej siły lepkości}
     \label{implementacja_4}
 \end{center}
-
+\noindent
 Działanie symulacji można uznać za satysfakcjonujące. Pozwala ona na manipulację parametrami płynu i uzyskanie spodziewanych zmian w jego zachowaniu.\newline
-
-Z powodu implementacji symulacji przy użyciu porocesora graficznego, została ona podzielona na etapy zapisane w odpowiednich jądrach.\newline\
+\noindent
+Z powodu implementacji symulacji przy użyciu procesora graficznego, została ona podzielona na etapy zapisane w odpowiednich jądrach (eng. kernels).\newline\
+\newpage
 \subsection{Jądro sił zewnętrznych}
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Jądro sił zewnętrznych, label={lst4.5}]
 [numthreads(NumThreads, 1, 1)]
 void CalculateExternalForces(uint3 id : SV_DispatchThreadID)
 {
@@ -608,24 +669,19 @@ void CalculateExternalForces(uint3 id : SV_DispatchThreadID)
 
 	Velocities[id.x] += ExternalForces(Positions[id.x], Velocities[id.x]) * timeStep;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
+\end{lstlisting}
 
-Ciało funkcji ExternalForces():\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Ciało funkcji ExternalForces(), label={lst4.6}]
 float2 ExternalForces(float2 pos, float2 velocity)
 {
 	return float2(0, gravity);
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Jądro jest odpowiedzialne za nadanie każdej cząsteczce przyśpieszenie związanego z siłami zewnętrznymi, co w naszym przypadku oznacza tylko siłę grawitacji.\newline
+\end{lstlisting}
+\noindent
+Jądro sił zewnętrznych (listingi nr. \ref{lst4.5} i \ref{lst4.6}) jest odpowiedzialne za nadanie każdej cząsteczce przyśpieszenie związanego z siłami zewnętrznymi, co w naszym przypadku oznacza tylko siłę grawitacji.\newline
 
 \subsection{Jądro przewidywania pozycji cząstki}
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Jądro przewidywania pozycji cząstki, label={lst4.7}]
 void PredictPositions(uint3 id : SV_DispatchThreadID)
 {
 	if (id.x >= numParticles)
@@ -634,14 +690,12 @@ void PredictPositions(uint3 id : SV_DispatchThreadID)
 	const float predictionStep = 1 / 120.0;
 	PredictedPositions[id.x] = Positions[id.x] + Velocities[id.x] * predictionStep;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Na podstawie aktualnej pozycji i prędkości obliczana jest pozycja cząstki, która posłyży do obliczeń sił wpływających na tę cząstkę.\newline
+\end{lstlisting}
+\noindent
+Na podstawie aktualnej pozycji i prędkości obliczana jest pozycja cząstki, która posłyży do obliczeń sił wpływających na tę cząstkę (listing nr. \ref{lst4.7}).\newline
 
 \subsection{Jądro gęstości}
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Jądro gęstości, label={lst4.8}]
 [numthreads(NumThreads, 1, 1)]
 void CalculateDensities(uint3 id : SV_DispatchThreadID)
 {
@@ -651,12 +705,9 @@ void CalculateDensities(uint3 id : SV_DispatchThreadID)
 	float2 position = PredictedPositions[id.x];
 	Densities[id.x] = CalculateDensity(position);
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Ciało funkcji CalculateDensity():\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\end{lstlisting}
+\newpage
+\begin{lstlisting}[caption=Ciało funkcji CalculateDensity(), label={lst4.9}]
 float2 CalculateDensity(float2 position)
 {
 	float sqrSmoothingRadius = smoothingRadius * smoothingRadius;
@@ -679,12 +730,12 @@ float2 CalculateDensity(float2 position)
 
 	return float2(density, nearDensity);
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
+\end{lstlisting}
+\noindent
+Jądro gęstości (listingi nr. \ref{lst4.8} i \ref{lst4.9}) jest odpowiedzialne za obliczenie gęstości oraz bliskiej gęstości cząstek.\newline
 
 \subsection{Jądro sił ciśnienia}
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Jądro sił ciśnienia, label={lst4.10}]
 [numthreads(NumThreads, 1, 1)]
 void CalculatePressureForce(uint3 id : SV_DispatchThreadID)
 {
@@ -735,12 +786,12 @@ void CalculatePressureForce(uint3 id : SV_DispatchThreadID)
 	float2 acceleration = pressureForce / density;
 	Velocities[id.x] += acceleration * timeStep;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
+\end{lstlisting}
+\noindent
+Jądro sił ciśnienia (listing nr. \ref{lst4.10}) służy obliczeniu sił spowodowanych różnicami w gęstości płynu.\newline
+\newpage
 \subsection{Jądro sił lepkości}
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Jądro sił lepkości, label={lst4.11}]
 [numthreads(NumThreads, 1, 1)]
 void CalculateViscosity(uint3 id : SV_DispatchThreadID)
 {
@@ -772,12 +823,12 @@ void CalculateViscosity(uint3 id : SV_DispatchThreadID)
 	}
 	Velocities[id.x] += viscosityForce * viscosityStrength * timeStep;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
+\end{lstlisting}
+\noindent
+Jądro sił lepkości (listing nr \ref{lst4.11}) służy obliczeniu sił spowodowanych różnicami w prędkościach sąsiadujących cząstek.\newline
+\newpage
 \subsection{Jądro aktualizacji pozycji}
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Jądro aktualizacji pozycji, label={lst4.12}]
 [numthreads(NumThreads, 1, 1)]
 void UpdatePositions(uint3 id : SV_DispatchThreadID)
 {
@@ -787,19 +838,20 @@ void UpdatePositions(uint3 id : SV_DispatchThreadID)
 	Positions[id.x] += Velocities[id.x] * timeStep;
 	HandleCollisions(id.x);
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
+\end{lstlisting}
+\noindent
+Jądro aktualizacji pozycji (listing nr. \ref{lst4.12}) aktualizuje pozycje cząstek na podstawie wyliczonych sił na nie wpływających.\newline
 
 \subsection{Funkcje wygładzające}
 W wyniku badań empirycznych w implementacji symulacji został zastosowany szereg wybranych funkcji wygładzających.\newline
 \subsubsection{Funkcja wielomianowa szóstego stopnia}
-$$
+\begin{equation}\label{eqn25}
 W(r,h) = m(h)
 \begin{cases}
 (h^2-r^2)^3, & dla \space 0 \leq r \leq h\\
 0, & dla \space r > h
 \end{cases}
-$$
+\end{equation}
 
 \begin{center}
 \begin{tikzpicture}% y=x^2
@@ -828,22 +880,19 @@ $$
 \end{axis}
 \end{tikzpicture}
 \newline
-\caption{Rysunek 7: Funkcja wielomianowa szóstego stopnia}
+\caption{Rysunek 8: Funkcja wielomianowa szóstego stopnia}
 \label{functions_1}
 \end{center}
 
 \newline
 
-Gdzie $m(h)$ wynikające z normalizacji:
-
-$$
+\begin{equation}\label{eqn26}
 m(h) = \frac{35}{16\pi h^8}
-$$
+\end{equation}
 \newline
-Co w postaci algorytmicznej wygląda następująco:\newline
+Funkcja widoczna w formie kodu na listingu nr. \ref{lst4.13}\newline
 
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Funkcja wielomianowa szóstego stopnia, label={lst4.13}]
 float Poly6Kernel(float distance, float radius)
 {
 	if (distance >= radius)
@@ -851,19 +900,18 @@ float Poly6Kernel(float distance, float radius)
 	float v = radius * radius - distance * distance;
 	return v * v * v * Poly6ScalingFactor;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
+\end{lstlisting}
+\noindent
 Funkcja wielomianowa służy do obliczeń dotyczących lepkości. Ponieważ nie wykorzystujemy gradientu lepkości, możemy pozwolić na wykorzystanie funkcji o niskim gradiencie w okolicach wartości $x=0$. Zapewnia to bardziej łagodną granicę wygładzania ruchu cząstek.\newline
 
-\subsubsection{Funkcja "ostra" drugiego stopnia}
-$$
+\subsubsection{Funkcja ``ostra" drugiego stopnia}
+\begin{equation}\label{eqn27}
 W(r,h) = m(h)
 \begin{cases}
 (h-r)^2, & dla \space 0 \leq r \leq h\\
 0, & dla \space r > h
 \end{cases}
-$$
+\end{equation}
 
 \begin{center}
 \begin{tikzpicture}% y=x^2
@@ -892,22 +940,19 @@ $$
 \end{axis}
 \end{tikzpicture}
 \newline
-\caption{Rysunek 8: Funkcja "ostra" drugiego stopnia}
+\caption{Rysunek 9: Funkcja ``ostra" drugiego stopnia}
 \label{functions_2}
 \end{center}
 \newline
 
 
-Gdzie $m(h)$ wynikające z normalizacji:
-
-$$
+\begin{equation}\label{eqn28}
 m(h) = \frac{3}{\pi h^4}
-$$
+\end{equation}
 \newline
-Co w postaci algorytmicznej wygląda następująco:\newline
+Funkcja widoczna w formie kodu na listingu nr. \ref{lst4.14}\newline
 
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Funkcja ``ostra" drugiego stopnia, label={lst4.14}]
 float Pow2Kernel(float distance, float radius)
 {
 	if (distance >= radius)
@@ -915,19 +960,18 @@ float Pow2Kernel(float distance, float radius)
 	float v = radius - distance;
 	return v * v * SpikyPow2ScalingFactor;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
+\end{lstlisting}
+\noindent
 Funkcja została wykorzystana w obliczeniach gęstości przez wzgląd na wysoki gradient w okolicach początku układu współrzędnych.\newline
 
 \subsubsection{Gradient funkcji drugiego stopnia}
-$$
+\begin{equation}\label{eqn29}
 W(r,h) = m(h)
 \begin{cases}
 (r-h), & dla \space 0 \leq r \leq h\\
 0, & dla \space r > h
 \end{cases}
-$$
+\end{equation}
 
 
 \begin{center}
@@ -957,21 +1001,17 @@ $$
 \end{axis}
 \end{tikzpicture}
 \newline
-\caption{Rysunek 9: Gradient funkcji drugiego stopnia}
+\caption{Rysunek 10: Gradient funkcji drugiego stopnia}
 \label{functions_3}
 \end{center}
 
-\newline
-Gdzie $m(h)$ wynikające z normalizacji:
-
-$$
+\begin{equation}\label{eqn30}
 m(h) = \frac{-2}{\pi h^3}
-$$
+\end{equation}
 \newline
-Co w postaci algorytmicznej wygląda następująco:\newline
+Funkcja widoczna w formie kodu na listingu nr. \ref{lst4.15}\newline
 
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Gradient funkcji drugiego stopnia, label={lst4.15}]
 float Pow2KernelGradient(float distance, float radius)
 {
 	if (distance > radius)
@@ -979,19 +1019,18 @@ float Pow2KernelGradient(float distance, float radius)
 	float v = radius - distance;
 	return -v * SpikyPow2DerivativeScalingFactor;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
+\end{lstlisting}
+\noindent
 Funkcja ta służy do obliczeń z wykorzystaniem gradientu gęstości.\newline
-
-\subsubsection{Funkcja "ostra" trzeciego stopnia}
-$$
+\newpage
+\subsubsection{Funkcja ``ostra" trzeciego stopnia}
+\begin{equation}\label{eqn31}
 W(r,h) = m(h)
 \begin{cases}
 (h-r)^3, & dla \space 0 \leq r \leq h\\
 0, & dla \space r > h
 \end{cases}
-$$
+\end{equation}
 
 \begin{center}
 \begin{tikzpicture}% y=x^2
@@ -1020,21 +1059,17 @@ $$
 \end{axis}
 \end{tikzpicture}
 \newline
-\caption{Rysunek 10: Funkcja "ostra" trzeciego stopnia}
+\caption{Rysunek 11: Funkcja ``ostra" trzeciego stopnia}
 \label{functions_4}
 \end{center}
 
-\newline
-Gdzie $m(h)$ wynikające z normalizacji:
-
-$$
+\begin{equation}\label{eqn32}
 m(h) = \frac{4}{\pi h^5}
-$$
+\end{equation}
 \newline
-Co w postaci algorytmicznej wygląda następująco:\newline
+Funkcja widoczna w formie kodu na listingu nr. \ref{lst4.16}\newline
 
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Funkcja ``ostra" trzeciego stopnia, label={lst4.16}]
 float Pow3Kernel(float distance, float radius)
 {
 	if (distance >= radius)
@@ -1042,19 +1077,18 @@ float Pow3Kernel(float distance, float radius)
 	float v = radius - distance;
 	return v * v * v * SpikyPow3ScalingFactor;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Funkcja trzeciego stopnia przez zwiększony gradient w okolicach zera służy do symulacji bliskiej gęstości, która zakłada większą siłę w okolicach cząstki.\newline
-
+\end{lstlisting}
+\noindent
+Funkcja trzeciego stopnia przez zwiększony gradient w okolicach zera służy do symulacji bliskiego ciśnienia, która zakłada większą siłę w okolicach cząstki.\newline
+\newpage
 \subsubsection{Gradient funkcji trzeciego stopnia}
-$$
+\begin{equation}\label{eqn33}
 W(r,h) = m(h)
 \begin{cases}
 -(h-r)^2, & dla \space 0 \leq r \leq h\\
 0, & dla \space r > h
 \end{cases}
-$$
+\end{equation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -1083,21 +1117,18 @@ $$
 \end{axis}
 \end{tikzpicture}
 \newline
-\caption{Rysunek 11: Gradient funkcji trzeciego stopnia}
+\caption{Rysunek 12: Gradient funkcji trzeciego stopnia}
 \label{functions_5}
 \end{center}
 
 
-\newline
-Gdzie $m(h)$ wynikające z normalizacji:
-
-$$
+\begin{equation}\label{eqn34}
 m(h) = \frac{3}{\pi h^4}
-$$
+\end{equation}
 \newline
-Co w postaci algorytmicznej wygląda następująco:\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\noindent
+Funkcja widoczna w formie kodu na listingu nr. \ref{lst4.17}\newline
+\begin{lstlisting}[caption=Gradient funkcji trzeciego stopnia, label={lst4.17}]
 float Pow3KernelGradient(float distance, float radius)
 {
 	if (distance > radius)
@@ -1105,17 +1136,15 @@ float Pow3KernelGradient(float distance, float radius)
 	float v = radius - distance;
 	return -v * v * SpikyPow3DerivativeScalingFactor;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
+\end{lstlisting}
+\noindent
 Funkcja ta służy do obliczeń związanych z gradientem bliskiej gęstości.\newline
-
+\newpage
 \subsection{Tablice mieszające}
 Zastosowanie tablic mieszających wymaga pewnej modyfikacji kodu zarówno w jądrach jak i po stronie C\#.\newline
-Pierwszą zmianą jest konieczność dodatkowego obliczania skrótu komórki w której znajduje się cząsteczka wewnątrz jądra przewidywania pozycji.\newline
+Pierwszą zmianą jest konieczność dodatkowego obliczania skrótu komórki w której znajduje się cząsteczka wewnątrz jądra przewidywania pozycji (listing nr. \ref{lst4.18}).\newline
 
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\begin{lstlisting}[caption=Zmienione jądro przewidywania pozycji, label={lst4.18}]
 [numthreads(NumThreads, 1, 1)]
 void PredictPositions(uint3 id : SV_DispatchThreadID)
 {
@@ -1125,24 +1154,18 @@ void PredictPositions(uint3 id : SV_DispatchThreadID)
 	ParticleHashTable[id.x] = GetHash(cellIndex);
 	
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Skrót jest obliczany zgodnie z funkcją:\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\end{lstlisting}
+\noindent
+Skrót jest obliczany przez funkcję widoczną na listingu nr. \ref{lst4.19}\newline
+\begin{lstlisting}[caption=First listing, label={lst4.19}]
 float GetHash(int2 cellIndex)
 {
 	return ((cellIndex.x * 73856093) ^ (cellIndex.y * 19349663)) % hashTableSize;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Kolejnym krokiem jest posortowanie cząstek wdług skrótu.\newline
-
-Jądro sortowania cząsteczek wygląda następująco:\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\end{lstlisting}
+\noindent
+Kolejnym krokiem jest posortowanie cząstek wdług skrótu (listing nr. \ref{lst4.20}).\newline
+\begin{lstlisting}[caption=First listing, label={lst4.20}]
     [numthreads(NumThreads, 1, 1)]
 void SortParticlesByHash(uint3 id : SV_DispatchThreadID)
 {
@@ -1169,12 +1192,10 @@ void SortParticlesByHash(uint3 id : SV_DispatchThreadID)
         Velocities[partnerId] = tempFloat2;
     }
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Oraz część kodu po stronie C\# odpowiedzialna za odpowiednie wywołania na procesorze graficznym:\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\end{lstlisting}
+\noindent
+Wymagana jest dodatkowo modyfikacja kodu po stronie C\# odpowiedzialnego za wywoływanie jąder (listing nr. \ref{lst4.21}).\newline
+\begin{lstlisting}[caption=First listing, label={lst4.21}]
 for (int sortingGroupSize = 2; sortingGroupSize <= particleCount; sortingGroupSize *= 2)
 {
     for (int sortingDistance = sortingGroupSize / 2; sortingDistance > 0; sortingDistance /= 2)
@@ -1184,22 +1205,28 @@ for (int sortingGroupSize = 2; sortingGroupSize <= particleCount; sortingGroupSi
         Dispatch(compute, particleCount, kernelIndex: sortParticlesByHashKernel);
     }
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Kod ten jest implementacją sortowania bitonicznego, które jest metodą sortowania przestosowaną do wysokiego zrównoleglenia. W wyniku jego działania przeprowadzany jest następujący schemat porównań wartości sortowanych:\newline
+\end{lstlisting}
+\noindent
+Kod ten jest implementacją sortowania bitonicznego\cite{bitonic}, które jest metodą sortowania przestosowaną do wysokiego zrównoleglenia. 
+Sortowanie bitoniczne (eng. Bitonic sort) jest algorytmem sortowania zaprojektowanym na architektury równoległe. Został opracowany przez K. E. Batchera i jest algorytmem opartym na sieci porównań (sorting network). Sortowanie bitoniczne posiada deterministyczna struktura porównań, co czyni go efektywnym w środowiskach o dużym stopniu równoległości, takich jak procesory graficzne.\newline\newline
+\indent
+Sortowanie bitoniczne składa się z dwóch etapów:\newline
+\textbf{Budowa sekwencji} - dane wejściowe są dzielone na zwiększające się podciągi, które są naprzemiennie sortowane rosnąco i malejąco. W wyniku tego uzyskujemy sekwencje o rosnącym rozmiarze,\newline
+\textbf{Scalanie} - Każda sekwencja jest następnie przekształcana na w pełni posortowaną. Proces ten polega na porównywaniu par elementów oddalonych o określony dystans, zmniejszany w kolejnych krokach o połowę.\newline\newline
+\indent
+Sortowanie bitoniczne jest przeznaczone do sortowania liczby elementów będących potęgą dwójki. W przypadku chęci posortowania ilości elementów niespełniających tego kryterium wymagane jest sztuczne dopełnienie zbioru.\newline
+Przykładowy schemat porównań wartości sortowanych dla 16 elementów jest przedstawiony na rys. \hyperref[implementation_1]{13}.\newline
 
 \begin{center}
-    \includegraphics[width=6.5in]{Bitonic.png}
-    \caption{Rysunek 12: Schemat sortowania bitonicznego}
+    \includegraphics[width=6.2in]{Bitonic.png}
+    \caption{Rysunek 13: Schemat sortowania bitonicznego}
     \label{implementation_1}
 \end{center}
 \newline\newline
 
-
-Kolejnym krokiem jest zbudowanie tablicy szybkiego dostępu:\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\noindent
+Kolejnym krokiem jest zbudowanie tablicy szybkiego dostępu (listing nr. \ref{lst4.22}).\newline
+\begin{lstlisting}[caption=Tworzenie tablicy szybkiego dostępu, label={lst4.22}]
 [numthreads(NumThreads,1,1)]
 void BuildHashOffsetTable(uint3 id : SV_DispatchThreadID)
 {
@@ -1215,12 +1242,10 @@ void BuildHashOffsetTable(uint3 id : SV_DispatchThreadID)
 	}
     HashOffsetTable[id.x] = numParticles;
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Wykorzystanie powstałej struktury również wymaga odpowiedniej modyfikacji w jądrach wymagających dostępu do cząstek sąsiednich.\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\end{lstlisting}
+\noindent
+Wykorzystanie powstałej struktury również wymaga odpowiedniej modyfikacji w jądrach wymagających dostępu do cząstek sąsiednich (listing nr. \ref{lst4.23}).\newline
+\begin{lstlisting}[caption=Zmiana w jądrach wyszukujących siąsiednie cząstki, label={lst4.23}]
 [numthreads(NumThreads, 1, 1)]
 void CalculateDensities(uint3 id : SV_DispatchThreadID)
 {
@@ -1243,12 +1268,10 @@ void CalculateDensities(uint3 id : SV_DispatchThreadID)
     }
     [...]
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
-
-Przez możliwość kolizji niemożliwe jest bezpośrednie sprawdzanie cząstek na podstawie otrzymanych skórtów. Wymagane jest wcześniejsze wyeliminowanie elementów powtarzających się, czym zajmuje się funkcja GetNeighbouringCellHashes(cellIndex, neighborHashes);\newline
-\noindent\rule{6in}{0.4pt}
-\begin{verbatim}
+\end{lstlisting}
+\noindent
+Przez możliwość kolizji niemożliwe jest bezpośrednie sprawdzanie cząstek na podstawie otrzymanych skrótów. Wymagane jest wcześniejsze wyeliminowanie elementów powtarzających się, czym zajmuje się funkcja GetNeighbouringCellHashes(cellIndex, neighborHashes) (listing nr. \ref{lst4.24}).\newline
+\begin{lstlisting}[caption=Wyznaczenie kluczy sąsiadujących komórek bez elementów powtarzających się, label={lst4.24}]
 void GetNeighbouringCellHashes(int2 cellIndex, out uint results[9])
 {
 	uint offsets[] = {
@@ -1262,7 +1285,6 @@ void GetNeighbouringCellHashes(int2 cellIndex, out uint results[9])
 		 1, 0,
 		 1, 1
 	};
-	
     uint idx = 0;
     for (int i = 0; i < 9; i++)
     {	
@@ -1284,125 +1306,161 @@ void GetNeighbouringCellHashes(int2 cellIndex, out uint results[9])
         }
     }
 }
-\end{verbatim}
-\noindent\rule{6in}{0.4pt}
+\end{lstlisting}
 
+\newpage
 \section{Badania}
 \subsection{Unity Profiler}
 Badania zostały przeprowadzone w środowisku Unity przy użyciu Unity Profiler.\newline
 Unity Profiler pozwala na zbieranie i wizualizację danych odnośnie zużycia czasu procesora i pamięci przez poszczególne fragmenty programu.\newline
 Narzędzie pozwala na inspekcję pojedynczych klatek pod względem wydajności celem optymalizacji pracy aplikacji.\newline
-Narzędzie pozwala na wizualizację zasobu z podziałem na rodzaje zużycia tego zasobu.\newline
+Narzędzie pozwala na wizualizację zasobu z podziałem na rodzaje zużycia tego zasobu (rys. \hyperref[badania_1]{14}).\newline
 \begin{center}
-    \includegraphics[width=7in]{profiler_wykres.png}
-    \caption{Rysunek 13: Unity profiler - wizualizacja zużycia zasobów w czasie}
+    \includegraphics[width=6.2in]{profiler_wykres.png}
+    \caption{Rysunek 14: Unity profiler - wizualizacja zużycia zasobów w czasie}
     \label{badania_1}
 \end{center}
-Unity Profiler zapewnia także widok hierarchiczy z dokładnymi parametrami wybranych części programu, bądź wezwanych jąder procesora graficznego.\newline
+Unity Profiler zapewnia także widok hierarchiczy (rys. \hyperref[badania_2]{15}) z dokładnymi parametrami wybranych części programu, bądź wezwanych jąder procesora graficznego.\newline
 \begin{center}
-    \includegraphics[width=7in]{profiler_hierarhia.png}
-    \caption{Rysunek 14: Unity profiler - widok hierarchiczny zużycia zasobów}
+    \includegraphics[width=6.2in]{profiler_hierarhia.png}
+    \caption{Rysunek 15: Unity profiler - widok hierarchiczny zużycia zasobów}
     \label{badania_2}
 \end{center}
 
 \subsection{Wyniki}
 \subsubsection{Metoda siłowa}
 \begin{center}
-    \includegraphics[width=6.5in]{siła.png}
-    \caption{Rysunek 15: Czas wykonania poszczególnych jąder w metodzie siłowej}
+    \includegraphics[width=6.2in]{siła.png}
+    \caption{Rysunek 16: Czas wykonania poszczególnych jąder w metodzie siłowej}
     \label{wyniki_1}
 \end{center}
 \begin{center}
-    \includegraphics[width=6.5in]{siła_skumulowany.png}
-    \caption{Rysunek 16: Skumulowany czas wykonania jąder w metodzie siłowej}
+    \includegraphics[width=6.2in]{siła_skumulowany.png}
+    \caption{Rysunek 17: Skumulowany czas wykonania jąder w metodzie siłowej}
     \label{wyniki_2}
 \end{center}
-Dla metody siłowej zauważalna jest kwadratowa zależność czasu obliczeń od liczby cząstek co prowadzi do gwałtownego wzrostu w jądrach wymagających odnalezienia sąsiadujących cząstek.\newline
+Dla metody siłowej zauważalna jest kwadratowa zależność czasu obliczeń (rys. \hyperref[wyniki_1]{16} i \hyperref[wyniki_2]{17}) od liczby cząstek co prowadzi do gwałtownego wzrostu w jądrach wymagających odnalezienia sąsiadujących cząstek.\newline
 \begin{center}
-    \includegraphics[width=6.5in]{siła-kompozycja.png}
-    \caption{Rysunek 17: Kompozycja klatki w metodzie siłowej}
+    \includegraphics[width=6.2in]{siła-kompozycja.png}
+    \caption{Rysunek 18: Kompozycja klatki w metodzie siłowej}
     \label{wyniki_3}
 \end{center}
-W wykresie skumulowanym czasu klatki symulacji widać, że dla wyższych ilości cząstek czasy przewidywania pozycji oraz jej aktualizacji są nieznaczące. Dodatkowo obliczenia sił zewnętrznych są pomijalne również dla niskich wartości.\newline
+W wykresie kompozycji czasu klatki symulacji (rys. \hyperref[wyniki_3]{18}) widać, że dla wyższych ilości cząstek czasy przewidywania pozycji oraz jej aktualizacji są nieznaczące. Dodatkowo obliczenia sił zewnętrznych są pomijalne również dla niskich wartości.\newline
 
 \subsubsection{Tablice mieszające}
 Przedstawione wyniki dotyczą symulacji z liczbą cząstek równą 8096.\newline
 \begin{center}
-    \includegraphics[width=6.5in]{pojedyncze.png}
-    \caption{Rysunek 18: Czas wykonania poszczególnych jąder z użyciem tablic mieszających}
+    \includegraphics[width=6.2in]{pojedyncze.png}
+    \caption{Rysunek 19: Czas wykonania poszczególnych jąder z użyciem tablic mieszających}
     \label{wyniki_4}
 \end{center}
 
 \begin{center}
-    \includegraphics[width=6.5in]{skumulowany.png}
-    \caption{Rysunek 19: Skumulowany czas wykonania jąder z użyciem tablic mieszających}
+    \includegraphics[width=6.2in]{skumulowany.png}
+    \caption{Rysunek 20: Skumulowany czas wykonania jąder z użyciem tablic mieszających}
     \label{wyniki_5}
 \end{center}
-Powyższy wykres pozwala stwierdzić na przyśpieszenie spowodowane odpowiednio dostosowaną wartością wielkości tablicy mieszającej. Tutaj wartość optymalna znajduje się w okolicach trzech tysięcy.\newline
-Co ciekawe dla bardzo niskich wielkości tablicy zauważalny jest początkowy wzrost. Jest to spowodowane faktem, że dla niskich wartości $M$ przypadki powodujące przyśpieszenie obliczeń są rzadkie i w większości sytuacji nadal sprawdzane są wszystkie możliwe cząstki w symulacji.\newline
+Wykresy przedstawione na rys. \hyperref[wyniki_4]{19} i \hyperref[wyniki_5]{20} pozwalają stwierdzić przyśpieszenie spowodowane odpowiednio dostosowaną wartością wielkości tablicy mieszającej. W tym konkretnym przypadku wartość optymalna znajduje się w okolicach trzech tysięcy.\newline\newline
+indent
+Co ciekawe dla bardzo niskich wielkości tablicy zauważalny jest początkowy wzrost. Jest to spowodowane faktem, iż dla niskich wartości $M$ przypadki powodujące przyśpieszenie obliczeń są rzadkie i w większości sytuacji nadal sprawdzane są wszystkie możliwe cząstki w symulacji.\newline
 Zauważalna jest znaczna poprawa czasowa względem metody siłowej.\newline
 \begin{center}
-    \includegraphics[width=6.5in]{kompozycja.png}
-    \caption{Rysunek 20: Kompozycja klatki przy użyciu tablic mieszających}
+    \includegraphics[width=6.2in]{kompozycja.png}
+    \caption{Rysunek 21: Kompozycja klatki przy użyciu tablic mieszających}
     \label{wyniki_6}
 \end{center}
-Oprócz niskiego wpływu obliczeń dotyczących sił zewnętrznych dodatkowo dla wzrastającej wielkości tablicy zauważalny jest również spodziewany wzrost czasu tworzenia tablicy skrótów.\newline
+Oprócz niskiego wpływu obliczeń dotyczących sił zewnętrznych dodatkowo dla wzrastającej wielkości tablicy zauważalny jest również spodziewany wzrost czasu tworzenia tablicy skrótów (rys. \hyperref[wyniki_6]{21}).\newline
 \begin{center}
-    \includegraphics[width=6.5in]{0.6.png}
-    \caption{Rysunek 21: Czas wykonania poszczególnych jąder z użyciem tablic mieszających z promieniem wygładzania = 0.6}
+    \includegraphics[width=6.2in]{0.6.png}
+    \caption{Rysunek 22: Czas wykonania poszczególnych jąder z użyciem tablic mieszających z promieniem wygładzania = 0.6}
     \label{wyniki_7}
 \end{center}
 \begin{center}
-    \includegraphics[width=6.5in]{1.png}
-    \caption{Rysunek 22: Czas wykonania poszczególnych jąder z użyciem tablic mieszających z promieniem wygładzania = 1}
+    \includegraphics[width=6.2in]{1.png}
+    \caption{Rysunek 23: Czas wykonania poszczególnych jąder z użyciem tablic mieszających z promieniem wygładzania = 1}
     \label{wyniki_8}
 \end{center}
 \begin{center}
-    \includegraphics[width=6.5in]{zestawienie.png}
-    \caption{Rysunek 23: Zestawienie całkowitego czasu symulacji dla różnych promieni wygładzania}
+    \includegraphics[width=6.2in]{zestawienie.png}
+    \caption{Rysunek 24: Zestawienie całkowitego czasu symulacji dla różnych promieni wygładzania}
     \label{wyniki_9}
 \end{center}
-Przy zmianie promienia wygładzania zauważalny jest wpływ na czas trwania kroku symulacji.\newline
+Przy zmianie promienia wygładzania zauważalny jest wpływ na czas trwania kroku symulacji (rys. \hyperref[wyniki_7]{22}, \hyperref[wyniki_8]{23} i \hyperref[wyniki_9]{24}) spowodowany zmianą wielkości komórki.\newline
 
 \subsubsection{Stały indeks}
  Zastąpienie sposobu wyliczania indeksu w tablicy za pomocą funkcji xor na numerowane komórki pozwala na przyśpieszenie działania symulacji przy zużyciu tej samej ilości pamięci.
 
  \begin{center}
-    \includegraphics[width=6.5in]{stały.png}
-    \caption{Rysunek 24: Zestawienie całkowitego czasu klatki symulacji w zależności od metody}
-    \label{wyniki_9}
+    \includegraphics[width=6.2in]{stały.png}
+    \caption{Rysunek 25: Zestawienie całkowitego czasu klatki symulacji w zależności od metody}
+    \label{wyniki_10}
 \end{center}
 
-Dla przestrzeni symulacji $16 x 9$ i promienia wygładzania $h=0.415$ długości tablicy jest równa 858 komórek.\newline
-Jednak wielkość tablicy nie posiada większego znaczenia gdyż nawet dla większych tablic wykorzystanie metody oblczania indeksów nie pozwalającej na powstawanie kolizji okazuje się bardziej korzystwnym rozwiązaniem.
-
+Dla przestrzeni symulacji $16 x 9$ i promienia wygładzania $h=0.415$ długość tablicy jest równa 858 komórek.\newline
+Jednak wielkość tablicy nie posiada większego znaczenia gdyż nawet dla większych tablic wykorzystanie metody oblczania indeksów nie pozwalającej na powstawanie kolizji okazuje się bardziej korzystwnym rozwiązaniem (rys. \hyperref[wyniki_10]{25}).
+\newpage
 \section{Podsumowanie}
-Celem pracy było zaprojektowanie oraz implementacja wydajnej symulacji płynów opartej na metodzie SPH, ze szczególnym uwzględnieniem etapu wyszukiwania cząstek sąsiadujących. Problem ten stanowi kluczowy element wpływający wydajność całego algorytmu.\newline
+Celem pracy było zaprojektowanie oraz implementacja wydajnej symulacji płynów opartej na metodzie SPH, ze szczególnym uwzględnieniem etapu wyszukiwania cząstek sąsiadujących. Problem ten stanowi kluczowy element wpływający wydajność całego algorytmu.\newline\newline
+\indent
 W pracy przedstawione zostały podstawy matematyczne metody SPH, obejmujące dyskretyzację równań Naviera-Stokesa i wykorzystanie funkcji wygładzających. Omówiono sposób obliczania gęstości, sił ciśnienia, lepkości oraz sił zewnętrznych działających na cząstki.\newline\newline
+\indent
 Implementacja algorytmu została zrealizowana z wykorzystaniem procesora graficznego, co pozwoliło na masowe zrównoleglenie obliczeń. Przedstawiono strukturę jąder obliczeniowych oraz mechanizmy sortowania cząstek według kluczy haszujących. Zwrócono uwagę na znaczenie koalescencji dostępu do pamięci oraz minimalizacji operacji synchronizacyjnych, które mają istotny wpływ na wydajność obliczeń na architekturze GPU.\newline\newline
+\indent
 Wyniki przeprowadzonych testów wydajnościowych potwierdziły przewagę zaproponowanego podejścia nad metodą siłową. Analiza czasów wykonania wykazała znaczące skrócenie czasu obliczeń dla dużej liczby cząstek, bez zmian w jakości symulacji. Dodatkowo przeanalizowano wpływ rozmiaru komórki siatki oraz parametrów tablicy mieszającej na efektywność wyszukiwania sąsiadów.\newline\newline
+\indent
 Podsumowując, zastosowanie haszowania przestrzennego w połączeniu z obliczeniami równoległymi na GPU stanowi skuteczne rozwiązanie problemu optymalizacji symulacji SPH. Uzyskane rezultaty potwierdzają zasadność wykorzystania struktur danych opartych na podziale przestrzeni w symulacjach cząsteczkowych. Przedstawione rozwiązanie może stanowić punkt wyjścia do dalszych badań, obejmujących m.in. symulacje trójwymiarowe, adaptacyjne metody doboru promienia wygładzania oraz dodatkowe techniki stabilizacji numerycznej.\newline
 
+\newpage
+
 \section{Bibliografia}
+\begingroup
+\renewcommand{\section}[2]{}
 \begin{thebibliography}{9}
-\bibitem{article1}
-Matthias Müller, David Charypar i Markus Gross (2003) Particle-Based Fluid Simulation for Interactive Applications
 
-\bibitem{article2}
-Simon Clavet, Philippe Beaudoin, i Pierre Poulin (2005) Particle-based Viscoelastic Fluid Simulation
+\bibitem{navier}
+L. Navier (1827) Mém. Acad. Sci
 
-\bibitem{article3}
-Mathieu Desbrun i Marie-Paule Gascuel (1996) Smoothed Particles: A new paradigm for
+\bibitem{stokes}
+G.G. Stokes (1843) Trans. Cambridge Phil. Soc.
+
+\bibitem{sph}
+J. J. Monaghan. (1992) Smoothed particle hydrodynamics.
+
+\bibitem{sca03}
+M. Müller, D. Charypar i M. Gross (2003) Particle-Based Fluid Simulation for Interactive Applications
+
+\bibitem{uniform_grid}
+V. Akman, W.R. Franklin, M. Kankanhalli i C. Narayanaswami (1989) Geometric computing and uniform grid technique
+
+\bibitem{spatial_hashing}
+M. Teschner, B. Heidelberger i M. Müller (2003) Optimized Spatial Hashing for Collision Detection of Deformable Objects
+
+\bibitem{bitonic}
+M.F. Ionescu i K.E. Schauser (1997) Optimizing parallel bitonic sort
+
+\bibitem{desburn}
+M. Desbrun i M. Gascuel (1996) Smoothed Particles: A new paradigm for
 animating highly deformable bodies
 
-\bibitem{article4}
-Simon Premože, Tolga Tasdizen, James Bigler, Aaron Lefohn i Ross T. Whitaker (2003) Particle-Based Simulation of Fluids
+\bibitem{viscoelastic}
+S. Clavet, P. Beaudoin, i P. Poulin (2005) Particle-based Viscoelastic Fluid Simulation
 
-\bibitem{article5}
-J. P. Morris. (2000) Simulating surface tension with smoothed particle
+\bibitem{cuda}
+S. Green (2012) Particle Simulation using CUDA
+
+\bibitem{algorithms}
+T. H. Cormen, C. E. Leiserson, R. L. Rivest i C. Stein (2022) Introduction to algorithms
+
+\bibitem{art2}
+S. Premože, T. Tasdizen, J. Bigler, A. Lefohn i R. T. Whitaker (2003) Particle-Based Simulation of Fluids
+
+\bibitem{art3}
+J. P. Morris (2000) Simulating surface tension with smoothed particle
 hydrodynamics.
 
 \bibitem{book1}
-D. Pnueli and C. Gutfinger. (1992) Fluid Mechanics.
+D. Pnueli i C. Gutfinger. (1992) Fluid Mechanics.
 \end{thebibliography}
+\endgroup
+
 \end{document}
